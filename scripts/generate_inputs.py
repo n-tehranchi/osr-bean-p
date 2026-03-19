@@ -50,36 +50,52 @@ def kg_ha_to_umol_ml(p_kg_ha: float) -> float:
 
 
 def set_secondary_growth_multiplier(xml_text: str, value: float) -> str:
-    """Replace all secondary growth rate multiplier values in the XML."""
+    """Replace secondary growth rate multiplier values in the XML.
+
+    In the OSR format, multiplier values are nested inside secondaryGrowthRate
+    SimulaTable elements as:
+      <SimulaConstant name="multiplier">VALUE</SimulaConstant>
+
+    We target only multipliers inside secondaryGrowthRate tables (not aerenchyma).
+    """
+    # Match the secondaryGrowthRate table block and replace the multiplier within
+    def replace_in_block(match):
+        block = match.group(0)
+        return re.sub(
+            r'(<SimulaConstant\s+name="multiplier">)[^<]+(</SimulaConstant>)',
+            rf'\g<1>{value}\g<2>',
+            block,
+        )
+
     return re.sub(
-        r'(<parameter\s+name="secondary growth rate multiplier">)'
-        r'[^<]+'
-        r'(</parameter>)',
-        rf'\g<1>{value}\g<2>',
+        r'<SimulaTable[^>]*name_column2="secondaryGrowthRate"[^>]*>.*?</SimulaTable>',
+        replace_in_block,
         xml_text,
+        flags=re.DOTALL,
     )
 
 
 def set_phosphorus_concentration(xml_text: str, conc_umol_ml: float) -> str:
     """Replace the phosphorus soil-solution concentration table values.
 
-    The template table looks like:
-      <table name="concentration" ...>
-        -1000 0.001  -30 0.001  ...  0 0.001
-        0.0001 0  1000 0
-      </table>
-    inside the <phosphorus> block under <soil>.
+    In the OSR format, the soil phosphorus concentration table is:
+      <SimulaBase name="phosphorus">
+        ...
+        <SimulaTable ... name_column2="concentration" ...>
+          -1000 0.001 -30 0.001 ... 0 0.001 0.0001 0 1000 0
+        </SimulaTable>
+    inside a SimulaDirective path="soil" block.
 
-    Strategy: find the <phosphorus> block under <soil>, then within it replace
-    the concentration table's numeric values (preserving depth keys and the
-    above-surface zeros).
+    Strategy: find the phosphorus section inside the soil directive, then within
+    it replace the concentration table's numeric values (preserving depth keys
+    and the above-surface zeros).
     """
-    # Match the phosphorus section inside <soil>
+    # Match the phosphorus section inside soil directive
     soil_p_pattern = re.compile(
-        r'(<soil>.*?<phosphorus>.*?'
-        r'<table\s+name="concentration"[^>]*>)'
+        r'(path="soil">.*?<SimulaBase\s+name="phosphorus">.*?'
+        r'<SimulaTable[^>]*name_column2="concentration"[^>]*>)'
         r'(.*?)'
-        r'(</table>)',
+        r'(</SimulaTable>)',
         re.DOTALL,
     )
 
@@ -88,10 +104,6 @@ def set_phosphorus_concentration(xml_text: str, conc_umol_ml: float) -> str:
         table_body = match.group(2)
         suffix = match.group(3)
 
-        # The table body has depth-value pairs.  Replace non-zero concentration
-        # values (the ones at negative depths / zero depth) with the new value,
-        # but keep the zero values for above-surface entries.
-        # Pattern: a depth token followed by a value token
         def replace_pair(pair_match):
             depth_str = pair_match.group(1)
             val_str = pair_match.group(2)
@@ -110,7 +122,7 @@ def set_phosphorus_concentration(xml_text: str, conc_umol_ml: float) -> str:
         )
         return prefix + new_body + suffix
 
-    # Only replace the FIRST match (inside <soil>), not nutrient-uptake sections
+    # Only replace the FIRST match (inside soil), not nutrient-uptake sections
     return soil_p_pattern.sub(replace_conc_values, xml_text, count=1)
 
 

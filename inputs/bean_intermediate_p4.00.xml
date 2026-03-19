@@ -6,12 +6,11 @@
 
   Study: "Reduction in Root Secondary Growth as a Strategy for Phosphorus Acquisition"
   Notes: This file represents the reference (wild-type / advanced secondary growth)
-         parameterization. To simulate the reduced-secondary-growth genotype, set
-         the 'multiplier' under 'secondary growth rate' to 0 for relevant root classes.
+         parameterization. Secondary growth rate multiplier = 1.0.
 
   Root classes modeled:
     - hypocotyl (ID 96)
-    - basal whorl1, whorl2, whorl3
+    - basal whorl1, whorl2, whorl3 (ID 99)
     - hypocotyl born roots (ID 98)
     - lateral basal roots (ID 97)
     - lateral hypocotyl born roots (ID 97)
@@ -22,1338 +21,1211 @@
     - finelateral fast growing (ID 97)
 -->
 
-<SimRoot>
+<SimulationModel date="xxx" defaultMaximumTimeStep="0.1" name="bean">
+	<SimulaBase name="atmosphere" />
+	<SimulaBase name="soil" />
+	<SimulaBase name="plants" objectGenerator="fieldPlanting" />
+	<SimulaBase name="simulationControls">
+		<SimulaConstant type="integer" name="SimulaStochastic::numberOfSamples">1</SimulaConstant>
+		<SimulaConstant name="randomNumberGeneratorSeed" type="int">0</SimulaConstant>
+		<SimulaBase name="integrationParameters">
+			<SimulaConstant name="defaultSpatialIntegrationLength" unit="cm">1.</SimulaConstant>
+		</SimulaBase>
+		<SimulaBase name="outputParameters">
+			<SimulaBase name="defaults">
+				<SimulaConstant name="startTime" type="time">0.</SimulaConstant>
+				<SimulaConstant name="endTime" type="time">42</SimulaConstant>
+				<SimulaConstant name="timeInterval" type="time">0.1</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="probeAllObjects">
+				<SimulaConstant name="run" type="bool">0</SimulaConstant>
+				<SimulaConstant name="timeInterval" type="time">1</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="garbageCollection">
+				<SimulaConstant name="run" type="bool">1</SimulaConstant>
+				<SimulaConstant name="startTime" type="time">5</SimulaConstant>
+				<SimulaConstant name="lackTime" type="time">1</SimulaConstant>
+				<SimulaConstant name="timeInterval" type="time">1</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="modelDump">
+				<SimulaConstant name="run" type="bool">0</SimulaConstant>
+				<SimulaConstant name="startTime" type="time">0</SimulaConstant>
+				<SimulaConstant name="endTime" type="time">0.1</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="rasterImage">
+				<SimulaConstant name="run" type="bool">0</SimulaConstant>
+				<SimulaConstant name="startTime" type="time">5.</SimulaConstant>
+				<SimulaConstant name="timeInterval" type="time">5.</SimulaConstant>
+				<SimulaConstant name="voxelsize" unit="cm">0.1</SimulaConstant>
+				<SimulaConstant name="substeps" unit="#" type="integer">1</SimulaConstant>
+				<SimulaConstant name="edgeSmoothing" unit="cm">0.00</SimulaConstant>
+				<SimulaConstant name="rootDiameterScalingFactor" unit="100%">1.</SimulaConstant>
+				<SimulaConstant name="includeBinaryRawImage" type="bool">false</SimulaConstant>
+				<SimulaConstant name="includeVTKImage" type="bool">false</SimulaConstant>
+				<SimulaConstant name="overlapFunction" type="string">additive</SimulaConstant>
+				<SimulaConstant name="radiusComesFrom" type="string">rootDiameter,phosphorus/radiusDepletionZone</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="vtp">
+				<SimulaConstant name="run" type="bool">0</SimulaConstant>
+				<SimulaConstant name="timeInterval" type="time">1</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="VTU">
+				<SimulaConstant name="run" type="bool">0</SimulaConstant>
+				<SimulaConstant name="timeInterval" type="time">1.</SimulaConstant>
+				<SimulaConstant name="includeShoots" type="bool">0</SimulaConstant>
+				<SimulaConstant name="includeRoots" type="bool">1</SimulaConstant>
+				<SimulaConstant name="includeVTUForDepletionZones" type="bool">1</SimulaConstant>
+				<SimulaConstant name="includePointData" type="bool">1</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="tableOfRootNodes">
+				<SimulaConstant name="run" type="bool">0</SimulaConstant>
+				<SimulaConstant name="timeInterval" type="time">8</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="table">
+				<SimulaConstant name="run" type="bool">1</SimulaConstant>
+				<SimulaConstant name="searchingDepth" type="integer">5</SimulaConstant>
+				<SimulaConstant name="skipTheseVariables" type="string">primaryRoot, hypocotyl</SimulaConstant>
+			</SimulaBase>
+		</SimulaBase>
+	</SimulaBase>
+	<SimulaBase name="plantTemplate" />
+	<SimulaBase name="shootTemplate">
+		<SimulaLink name="extinctionCoefficient" />
+	</SimulaBase>
+	<SimulaBase name="hypocotylTemplate">
+		<SimulaBase name="dataPoints" objectGenerator="rootDataPoints" />
+		<SimulaPoint name="growthpoint" function="rootGrowthDirection" garbageCollectionOff="true">0 0 0
+			<SimulaVariable name="rootLongitudinalGrowth" unit="cm" function="scaledRootGrowthRate" garbageCollectionOff="true" />
+			<SimulaLink name="rootDiameter" unit="cm" linksName="diameter" />
+		</SimulaPoint>
+		<SimulaBase name="branches" />
+	</SimulaBase>
+	<SimulaBase name="siblingRootTemplate">
+		<SimulaBase name="dataPoints" objectGenerator="rootDataPoints" />
+		<SimulaPoint name="growthpoint" function="rootGrowthDirection" garbageCollectionOff="true">0 0 0
+			<SimulaVariable name="rootLongitudinalGrowth" unit="cm" function="scaledRootGrowthRate" garbageCollectionOff="true" />
+			<SimulaLink name="rootDiameter" unit="cm" linksName="diameter" />
+		</SimulaPoint>
+		<SimulaBase name="branches" />
+	</SimulaBase>
+	<SimulaBase name="dataPointTemplate" type="Coordinate">
+		<SimulaVariable name="rootDiameter" unit="cm" function="secondaryGrowth" />
+		<SimulaDerivative name="rootClassID" function="rootClassID" />
+		<SimulaDerivative name="parentRootClassID" function="rootClassID" />
+		<SimulaDerivative name="combinedRootClassID" function="rootClassID" />
+		<SimulaDerivative name="spatialRootDensity" unit="cm/cm3" function="proximity" />
+	</SimulaBase>
 
-  <!-- ============================================================ -->
-  <!--  ENVIRONMENT                                                 -->
-  <!-- ============================================================ -->
-  <environment>
+	<!-- ============================================================ -->
+	<!--  ENVIRONMENT                                                 -->
+	<!-- ============================================================ -->
+	<SimulaBase name="environment">
+		<SimulaBase name="dimensions">
+			<SimulaConstant name="resolution" type="coordinate">1 1 1</SimulaConstant>
+		</SimulaBase>
+		<SimulaBase name="soil">
+			<SimulaTable name_column1="depth" unit_column1="cm" name_column2="bulkDensity" unit_column2="g/cm3" garbageCollectionOff="true">-200 1.51 -65 1.51 -47 1.4 -30 1.42 -16 1.29 -5 1.24 0 1.24</SimulaTable>
+		</SimulaBase>
+		<SimulaBase name="plantingScheme">
+			<SimulaConstant name="numberOfPlantsInTheRow" type="integer">1</SimulaConstant>
+			<SimulaConstant name="numberOfRows" type="integer">1</SimulaConstant>
+			<SimulaConstant name="profileDepth" unit="cm">-150</SimulaConstant>
+			<SimulaConstant name="rowDirection" type="string">z</SimulaConstant>
+			<SimulaConstant name="rowSpacing" unit="cm">22</SimulaConstant>
+			<SimulaConstant name="inTheRowSpacing" unit="cm">30</SimulaConstant>
+			<SimulaConstant name="plantingDepth" unit="cm">-5</SimulaConstant>
+			<SimulaConstant name="plantingTime">0</SimulaConstant>
+			<SimulaConstant name="plantType" type="string">bean</SimulaConstant>
+		</SimulaBase>
+		<SimulaConstant name="startDay" unit="noUnit" type="integer">22</SimulaConstant>
+		<SimulaConstant name="startMonth" unit="noUnit" type="integer">6</SimulaConstant>
+		<SimulaBase name="atmosphere">
+			<SimulaConstant name="PAR/RDD" unit="100%">1.</SimulaConstant>
+			<SimulaTable name_column1="time" unit_column1="day" name_column2="actual durationof sunshine" unit_column2="hour" garbageCollectionOff="true">0 0 60 0</SimulaTable>
+			<SimulaConstant name="albedoCrop" unit="noUnit">0.23</SimulaConstant>
+			<SimulaConstant name="albedoSoil" unit="noUnit">0.17</SimulaConstant>
+			<SimulaConstant name="altitude" unit="m">91</SimulaConstant>
+			<SimulaTable name_column1="time" unit_column1="day" name_column2="averageDailyTemperature" unit_column2="degreesC" interpolationMethod="linear" garbageCollectionOff="true">0 16.9 100 16.9</SimulaTable>
+			<SimulaTable name_column1="time" unit_column1="day" name_column2="evaporation" unit_column2="cm/day" interpolationMethod="step" garbageCollectionOff="true">0 0 1 0.05 2 0.1 3 0.1 4 0.05 5 0.05 6 0.1 7 0.05 8 0.05 9 0.1 10 0.1 11 0.05 12 0.1 13 0.1 14 0.05 15 0.04 16 0.03 17 0.02 18 0.09 19 0.09 20 0.04 21 0.09 22 0.09 23 0.04 24 0.03 25 0.02 26 0.02 27 0.08 28 0.03 29 0.08 30 0.03 31 0.08 32 0.07 33 0.07 34 0.07 35 0.03 36 0.02 37 0.01 38 0 39 0 40 0 41 0 42 0.06</SimulaTable>
+			<SimulaConstant name="irradiation" unit="uMol/cm2/day">4000</SimulaConstant>
+			<SimulaConstant name="latitude" unit="noUnit">50.8</SimulaConstant>
+			<SimulaConstant name="netRadiation" unit="W/m2">50</SimulaConstant>
+			<SimulaConstant name="netRadiationSoil" unit="W/m2">0</SimulaConstant>
+			<SimulaTable name_column1="time" unit_column1="day" name_column2="precipitation" unit_column2="cm/day" interpolationMethod="step" garbageCollectionOff="true">0 0 1 0 2 1 3 0.29 4 0 5 0 6 0.61 7 0 8 0 9 0.25 10 0.03 11 0 12 0.64 13 0.33 14 0 15 0 16 0 17 0 18 1.8 19 0.2 20 0 21 2.84 22 0.38 23 0 24 0 25 0 26 0 27 0.18 28 0 29 0.46 30 0 31 1.35 32 0.13 33 0.23 34 0.25 35 0 36 0 37 0 38 0 39 0 40 0 41 0 42 1.42</SimulaTable>
+			<SimulaConstant name="relativeHumidity" unit="%">60</SimulaConstant>
+			<SimulaConstant name="windSpeed" unit="m/s">2</SimulaConstant>
+		</SimulaBase>
+	</SimulaBase>
 
-    <atmosphere>
-      <parameter name="PAR/ RDD">1</parameter>
-      <!-- actual duration of sunshine: zero for the whole run (controlled glasshouse) -->
-      <table name="actual durationof sunshine" x_name="time" x_unit="day" y_unit="hour">
-        0 0
-        60 0
-      </table>
-      <parameter name="albedo crop">0.23</parameter>
-      <parameter name="albedo soil">0.17</parameter>
-      <parameter name="altitude">91</parameter>  <!-- m -->
-      <table name="average daily temperature" x_name="time" x_unit="day" y_unit="degreesC">
-        0  16.9
-        100 16.9
-      </table>
-      <!-- evaporation: daily measured values (cm) -->
-      <table name="evaporation" x_name="time" x_unit="day" y_unit="cm">
-        0 0   1 0.05  2 0.1   3 0.1   4 0.05  5 0.05  6 0.1   7 0.05
-        8 0.05  9 0.1  10 0.1  11 0.05  12 0.1  13 0.1  14 0.05  15 0.04
-        16 0.03  17 0.02  18 0.09  19 0.09  20 0.04  21 0.09  22 0.09  23 0.04
-        24 0.03  25 0.02  26 0.02  27 0.08  28 0.03  29 0.08  30 0.03  31 0.08
-        32 0.07  33 0.07  34 0.07  35 0.03  36 0.02  37 0.01  38 0  39 0
-        40 0  41 0  42 0.06
-      </table>
-      <parameter name="irradiation">4000</parameter>  <!-- umol cm-2 day-1 -->
-      <parameter name="latitude">50.8</parameter>
-      <parameter name="net radiation">50</parameter>    <!-- W m-2 -->
-      <parameter name="net radiation soil">0</parameter>  <!-- W m-2 -->
-      <!-- precipitation: daily measured values (cm day-1) -->
-      <table name="precipitation" x_name="time" x_unit="day" y_unit="cm day-1">
-        0 0   1 0   2 1   3 0.29  4 0   5 0   6 0.61  7 0
-        8 0   9 0.25  10 0.03  11 0   12 0.64  13 0.33  14 0   15 0
-        16 0  17 0  18 1.8  19 0.2  20 0  21 2.84  22 0.38  23 0
-        24 0  25 0  26 0  27 0.18  28 0  29 0.46  30 0  31 1.35
-        32 0.13  33 0.23  34 0.25  35 0  36 0  37 0  38 0  39 0
-        40 0  41 0  42 1.42
-      </table>
-      <parameter name="relative humidity">60</parameter>   <!-- % -->
-      <parameter name="start day">22</parameter>
-      <parameter name="start month">6</parameter>
-      <parameter name="wind speed">2</parameter>  <!-- m s-1 -->
-    </atmosphere>
+	<!-- ============================================================ -->
+	<!--  SOIL: water, nitrate, phosphorus, potassium, organic        -->
+	<!-- ============================================================ -->
+	<SimulaDirective path="environment">
+		<SimulaDirective path="soil">
+			<SimulaBase name="water">
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="initialHydraulicHead" unit_column2="cm" garbageCollectionOff="true">-200 0 -151 -50 -50 -150 -45 -155 -40 -160 -35 -165 -30 -170 -25 -175 -20 -180 -15 -190 -10 -200 -5 -220 -2 -240 -1 -300 0 -400</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="residualWaterContent" unit_column2="100%" garbageCollectionOff="true">-300 0.067 0 0.067</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="saturatedConductivity" unit_column2="cm/day" garbageCollectionOff="true">-300 10.8 0 10.8</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="saturatedWaterContent" unit_column2="100%" garbageCollectionOff="true">-300 0.39 -65 0.39 -35 0.39 -25 0.43 -15 0.45 0 0.46</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="vanGenuchten:alpha" unit_column2="1/cm" garbageCollectionOff="true">-300 0.02 0 0.02</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="vanGenuchten:n" unit_column2="noUnit" garbageCollectionOff="true">-300 1.41 0 1.41</SimulaTable>
+				<SimulaConstant name="volumetricWaterContentInBarberCushman" unit="cm3/cm3">0.3</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="nitrate">
+				<SimulaConstant name="adsorptionCoefficient" unit="uMol/cm">0</SimulaConstant>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="bufferPower" unit_column2="noUnit" garbageCollectionOff="true">-1000 0.4 1000 0.4</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="concentration" unit_column2="umol/ml" garbageCollectionOff="true">-1000 1.59 -55 1.59 -45 1.67 -35 2.17 -25 3.15 -15 4.02 -5 2.36 0 2.8 0.01 0 100 0</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="diffusionCoefficient" unit_column2="cm2/day" garbageCollectionOff="true">-1000 0.07 0 0.07 1e-05 1e-08 1000 1e-08</SimulaTable>
+				<SimulaConstant name="increaseTimeStep">1</SimulaConstant>
+				<SimulaConstant name="longitudinalDispersivity" unit="cm">1</SimulaConstant>
+				<SimulaConstant name="r1-r0" unit="cm">4</SimulaConstant>
+				<SimulaConstant name="saturatedDiffusionCoefficient" unit="cm2/day">1.6416</SimulaConstant>
+				<SimulaConstant name="transverseDispersivity" unit="cm">0.5</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="organic">
+				<SimulaConstant name="CNRatioMicrobes" unit="g/g">10</SimulaConstant>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="CNratio" unit_column2="g/g" garbageCollectionOff="true">-10000 13 0 13</SimulaTable>
+				<SimulaConstant name="assimilationEfficiencyMicrobes">1</SimulaConstant>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="carbonContent" unit_column2="g/g" garbageCollectionOff="true">-200 0.005 -40 0.005 -30 0.01 -10 0.02 0 0.02</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="initialRelativeMineralisationRate" unit_column2="g/g/year" garbageCollectionOff="true">-1000 0 -25 0 -10 0.037 0 0.037</SimulaTable>
+				<SimulaConstant name="speedOfAging">0.46</SimulaConstant>
+				<SimulaConstant name="timeOffset" unit="day">30</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="phosphorus">
+				<SimulaConstant name="adsorptionCoefficient" unit="uMol/cm">1333.3</SimulaConstant>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="bufferPower" unit_column2="noUnit" garbageCollectionOff="true">-1000 400 1000 400</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="concentration" unit_column2="umol/ml" garbageCollectionOff="true">-1000 0.0645786 -30 0.0645786 -29 0.0645786 -10 0.0645786 -9 0.0645786 -5 0.0645786 -4 0.0645786 0 0.0645786 0.0001 0 1000 0</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="diffusionCoefficient" unit_column2="cm2/day" garbageCollectionOff="true">-1000 0.00019872 1000 0.00019872</SimulaTable>
+				<SimulaConstant name="increaseTimeStep">1.1</SimulaConstant>
+				<SimulaConstant name="longitudinalDispersivity" unit="cm">0</SimulaConstant>
+				<SimulaConstant name="r1-r0" unit="cm">0.3</SimulaConstant>
+				<SimulaConstant name="saturatedDiffusionCoefficient" unit="cm2/day">0.00495</SimulaConstant>
+				<SimulaConstant name="transverseDispersivity" unit="cm">0</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="potassium">
+				<SimulaConstant name="adsorptionCoefficient" unit="uMol/cm">33.3</SimulaConstant>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="bufferPower" unit_column2="noUnit" garbageCollectionOff="true">-1000 10 1000 10</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="concentration" unit_column2="umol/ml" garbageCollectionOff="true">-1000 0.05 -30 0.05 -29 0.15 0 0.15 1e-05 0 1000 0</SimulaTable>
+				<SimulaTable name_column1="depth" unit_column1="cm" name_column2="diffusionCoefficient" unit_column2="cm2/day" garbageCollectionOff="true">-1000 0.067 1000 0.067</SimulaTable>
+				<SimulaConstant name="increaseTimeStep">1.01</SimulaConstant>
+				<SimulaConstant name="longitudinalDispersivity" unit="cm">1</SimulaConstant>
+				<SimulaConstant name="r1-r0" unit="cm">1.5</SimulaConstant>
+				<SimulaConstant name="saturatedDiffusionCoefficient" unit="cm2/day">1.56</SimulaConstant>
+				<SimulaConstant name="transverseDispersivity" unit="cm">0.5</SimulaConstant>
+			</SimulaBase>
+		</SimulaDirective>
+	</SimulaDirective>
 
-    <dimensions>
-      <parameter name="max corner">11 0 15</parameter>   <!-- cm -->
-      <parameter name="min corner">-11 -150 -15</parameter>   <!-- cm -->
-      <parameter name="resolution">1 1 1</parameter>   <!-- cm -->
-    </dimensions>
+	<!-- ============================================================ -->
+	<!--  SWMS3D water flow solver                                    -->
+	<!-- ============================================================ -->
+	<SimulaDirective path="soil">
+		<SimulaExternal name="Swms3d" unit="noUnit" function="Swms3d" minTimeStep="0.001" />
+	</SimulaDirective>
 
-    <!-- ========== SOIL ========== -->
-    <soil>
+	<!-- ============================================================ -->
+	<!--  Plant template directives                                   -->
+	<!-- ============================================================ -->
+	<SimulaDirective path="plantTemplate">
+		<SimulaDerivative name="rootLength" unit="cm" function="plantTotalRootFraction" />
+		<SimulaDerivative name="rootVolume" unit="cm3" function="plantTotalRootFraction" />
+		<SimulaDerivative name="rootSurfaceArea" unit="cm2" function="plantTotalRootFraction" />
+		<SimulaVariable name="rootLongitudinalGrowth" unit="cm" function="plantTotalRootFraction" />
+		<SimulaDerivative name="D90" unit="cm" function="D95">
+			<SimulaConstant name="threshold">0.90</SimulaConstant>
+		</SimulaDerivative>
+	</SimulaDirective>
+	<SimulaDirective path="hypocotylTemplate">
+		<SimulaDirective path="growthpoint">
+			<SimulaDerivative name="rootCircumference" unit="cm" function="rootCircumference" />
+			<SimulaConstant name="rootSegmentLength" unit="cm" />
+			<SimulaConstant name="rootSegmentVolume" unit="cm3" />
+			<SimulaConstant name="rootSegmentSurfaceArea" unit="cm2" />
+		</SimulaDirective>
+		<SimulaDerivative name="rootLength" unit="cm" function="rootTotal.v2" />
+		<SimulaDerivative name="rootSystemLength" unit="cm" function="rootSystemTotal" />
+		<SimulaDerivative name="rootSurfaceArea" unit="cm2" function="rootTotal.v2" />
+		<SimulaDerivative name="rootSystemSurfaceArea" unit="cm2" function="rootSystemTotal" />
+		<SimulaDerivative name="rootVolume" unit="cm3" function="rootTotal.v2" />
+		<SimulaDerivative name="rootSystemVolume" unit="cm3" function="rootSystemTotal" />
+		<SimulaVariable name="rootSystemLongitudinalGrowth" unit="cm" function="rootSystemTotal" />
+	</SimulaDirective>
+	<SimulaDirective path="siblingRootTemplate">
+		<SimulaDirective path="growthpoint">
+			<SimulaDerivative name="rootCircumference" unit="cm" function="rootCircumference" />
+			<SimulaConstant name="rootSegmentLength" unit="cm" />
+			<SimulaConstant name="rootSegmentVolume" unit="cm3" />
+			<SimulaConstant name="rootSegmentSurfaceArea" unit="cm2" />
+		</SimulaDirective>
+		<SimulaDerivative name="rootLength" unit="cm" function="rootTotal.v2" />
+		<SimulaDerivative name="rootSystemLength" unit="cm" function="rootSystemTotal" />
+		<SimulaDerivative name="rootSurfaceArea" unit="cm2" function="rootTotal.v2" />
+		<SimulaDerivative name="rootSystemSurfaceArea" unit="cm2" function="rootSystemTotal" />
+		<SimulaDerivative name="rootVolume" unit="cm3" function="rootTotal.v2" />
+		<SimulaDerivative name="rootSystemVolume" unit="cm3" function="rootSystemTotal" />
+		<SimulaVariable name="rootSystemLongitudinalGrowth" unit="cm" function="rootSystemTotal" />
+	</SimulaDirective>
+	<SimulaDirective path="dataPointTemplate">
+		<SimulaDerivative name="rootCircumference" unit="cm" function="rootCircumference" />
+		<SimulaDerivative name="rootLength2Base" unit="cm" function="rootLength2Base" />
+		<SimulaDerivative name="rootSegmentLength" unit="cm" function="rootSegmentLength" />
+		<SimulaDerivative name="rootSegmentAge" unit="day" function="rootSegmentAge" />
+		<SimulaDerivative name="rootSegmentSurfaceArea" unit="cm2" function="rootSegmentSurfaceArea" />
+		<SimulaDerivative name="rootSegmentVolume" unit="cm3" function="rootSegmentVolume" />
+		<SimulaVariable name="rootPotentialSecondaryGrowth" unit="cm" function="potentialSecondaryGrowth" />
+	</SimulaDirective>
+	<SimulaDirective path="/plantTemplate">
+		<SimulaDerivative function="plantTotal" name="plantDryWeight" unit="g" />
+		<SimulaDerivative function="plantTotalShootFraction" name="shootDryWeight" unit="g" />
+		<SimulaDerivative function="plantTotalRootFraction" name="rootDryWeight" unit="g" />
+		<SimulaDerivative function="carbonToDryWeightRatio" name="carbonToDryWeightRatio" unit="100%" />
+	</SimulaDirective>
+	<SimulaDirective path="/shootTemplate">
+		<SimulaVariable function="potentialLeafArea" name="leafArea" unit="cm2" />
+		<SimulaDerivative function="leafAreaIndex" name="leafAreaIndex" unit="cm2/cm2" />
+		<SimulaVariable function="leafDryWeight.v2" name="leafDryWeight" unit="g" />
+		<SimulaVariable function="stemDryWeight" name="stemDryWeight" unit="g" />
+		<SimulaLink name="areaPerPlant" />
+	</SimulaDirective>
+	<SimulaDirective path="/hypocotylTemplate">
+		<SimulaDirective path="growthpoint">
+			<SimulaConstant name="rootSegmentDryWeight" unit="g">0</SimulaConstant>
+		</SimulaDirective>
+		<SimulaDerivative function="rootTotal.v2" name="rootDryWeight" unit="g" />
+		<SimulaDerivative function="rootSystemTotal" name="rootSystemDryWeight" unit="g" />
+	</SimulaDirective>
+	<SimulaDirective path="/siblingRootTemplate">
+		<SimulaDirective path="growthpoint">
+			<SimulaConstant name="rootSegmentSpecificWeight" unit="g/cm3">0</SimulaConstant>
+			<SimulaConstant name="rootSegmentDryWeight" unit="g">0</SimulaConstant>
+		</SimulaDirective>
+		<SimulaDerivative function="rootTotal.v2" name="rootDryWeight" unit="g" />
+		<SimulaDerivative function="rootSystemTotal" name="rootSystemDryWeight" unit="g" />
+	</SimulaDirective>
+	<SimulaDirective path="/dataPointTemplate">
+		<SimulaDerivative function="rootSegmentDryWeight" name="rootSegmentDryWeight" unit="g" />
+	</SimulaDirective>
 
-      <!-- Bulk density profile -->
-      <table name="bulk density" x_name="depth" x_unit="cm" y_unit="g cm-3">
-        -200 1.51
-        -65  1.51
-        -47  1.4
-        -30  1.42
-        -16  1.29
-        -5   1.24
-        0    1.24
-      </table>
+	<!-- ============================================================ -->
+	<!--  ROOT TYPE PARAMETERS                                        -->
+	<!-- ============================================================ -->
+	<SimulaBase name="rootTypeParameters">
+		<SimulaBase name="bean">
 
-      <!-- NITRATE -->
-      <nitrate>
-        <parameter name="adsorption coefficient">0</parameter>  <!-- umol cm-1 -->
-        <table name="buffer power" x_name="depth" x_unit="cm">
-          -1000 0.4
-          1000  0.4
-        </table>
-        <table name="concentration" x_name="depth" x_unit="cm" y_unit="umol ml-1">
-          -1000 1.59  -55 1.59  -45 1.67  -35 2.17  -25 3.15
-          -15   4.02  -5  2.36   0  2.8  0.01 0  100 0
-        </table>
-        <table name="diffusion coefficient" x_name="depth" x_unit="cm" y_unit="cm2 day-1">
-          -1000 0.07  0 0.07  1e-05 1e-08  1000 1e-08
-        </table>
-        <parameter name="increase time step">1</parameter>
-        <parameter name="longitudinal dispersivity">1</parameter>  <!-- cm -->
-        <parameter name="r1-r0">4</parameter>  <!-- cm -->
-        <parameter name="saturated diffusion coefficient">1.6416</parameter>  <!-- cm2 day-1 -->
-        <parameter name="transverse dispersivity">0.5</parameter>  <!-- cm -->
-      </nitrate>
+			<!-- ====== SHOOT ====== -->
+			<SimulaBase name="shoot">
+				<SimulaTable name_column1="time" unit_column1="day" name_column2="leafAreaExpantionRate" unit_column2="cm2/day" garbageCollectionOff="true">0 0 2 0 3 3 4 5 6 5 7.04 3.91 7.29 4.21 7.55 4.52 7.8 4.85 8.05 5.19 8.3 5.54 8.56 5.92 8.81 6.31 9.06 6.72 9.31 7.14 9.57 7.59 9.82 8.06 10.07 8.55 10.32 9.06 10.58 9.59 10.83 10.15 11.08 10.74 11.33 11.35 11.59 11.99 11.84 12.66 12.09 13.36 12.34 14.09 12.6 14.85 12.85 15.65 13.1 16.49 13.35 17.37 13.61 18.28 13.86 19.24 14.11 20.24 14.36 21.29 14.62 22.39 14.87 23.53 15.12 24.73 15.37 25.98 15.63 27.3 15.88 28.67 16.13 30.1 16.38 31.6 16.64 33.17 16.89 34.81 17.14 36.53 17.39 38.32 17.65 40.2 17.9 42.16 18.15 44.21 18.4 46.36 18.66 48.61 18.91 50.96 19.16 53.41 19.41 55.98 19.67 58.67 19.92 61.48 20.17 64.42 20.42 67.49 20.68 70.71 20.93 74.07 21.18 77.59 21.43 81.27 21.69 85.12 21.94 89.14 22.19 93.35 22.44 97.75 22.7 102.35 22.95 107.17 23.2 112.2 23.45 117.47 23.71 122.98 23.96 128.74 24.21 134.76 24.46 141.06 24.72 147.65 24.97 154.55 25.29 156.06 25.66 154.09 26.02 152.11 26.38 150.11 26.74 148.1 27.1 146.08 27.46 144.05 27.83 142.02 28.19 139.98 28.55 137.94 28.91 135.9 29.27 133.85 29.63 131.81 29.99 129.77 30.36 127.73 30.72 125.7 31.08 123.67 31.44 121.65 31.8 119.64 32.16 117.64 32.52 115.65 32.89 113.67 33.25 111.71 33.61 109.75 33.97 107.81 34.33 105.89 34.69 103.98 35.06 102.09 35.42 100.21 35.78 98.36 36.14 96.52 36.5 94.7 36.86 92.9 37.22 91.12 37.59 89.36 37.95 87.62 38.31 85.9 38.67 84.2 39.03 82.53 39.39 80.87 39.76 79.24 40.12 77.63 40.48 76.05 40.84 74.49 41.2 72.95 41.56 71.43 41.92 69.94 42.29 68.47 42.65 67.02 43.01 65.59 43.37 64.19 43.73 62.82 44.09 61.46 44.45 60.13 44.82 58.82 45.18 57.53 45.54 56.27 45.9 55.03 46.26 53.81 46.62 52.61 46.99 51.44 47.35 50.29 47.71 49.16 48.07 48.05 48.43 46.96 48.79 45.89 49.15 44.84 49.52 43.82 49.88 42.81 50.24 41.83 50.6 40.86 50.96 39.91 51.32 38.99 51.69 38.08 52.05 37.19 52.41 36.32 52.77 35.47 53.13 34.63 53.49 33.82 53.85 33.02 54.22 32.23 54.58 31.47 54.94 30.72 55.3 29.99 55.66 29.27 56.02 28.57 56.38 27.88 56.75 27.21 57.11 26.56 57.47 25.92 57.83 25.29 58.19 24.68 58.55 24.08 58.92 23.49 59.28 22.92 59.64 22.36</SimulaTable>
+				<SimulaConstant name="extinctionCoefficient" unit="noUnit">0.9</SimulaConstant>
+				<SimulaTable name_column1="time" unit_column1="day" name_column2="specificLeafArea" unit_column2="g/cm2" garbageCollectionOff="true">0 0.0015 24 0.0025 40 0.003 60 0.003</SimulaTable>
+				<SimulaConstant name="lightUseEfficiency" unit="g/uMol">3.8e-07</SimulaConstant>
+				<SimulaConstant name="areaPerPlant" unit="cm2">660</SimulaConstant>
+				<SimulaConstant name="aerenchymaPhotosynthesisMitigation" unit="100%">0.5</SimulaConstant>
+				<SimulaConstant name="relativePotentialTranspiration" unit="cm3/g">100</SimulaConstant>
+				<SimulaConstant name="relativeRespirationRateLeafs" unit="g/g/day">0.04</SimulaConstant>
+				<SimulaConstant name="relativeRespirationRateStems" unit="g/g/day">0.02</SimulaConstant>
+			</SimulaBase>
 
-      <!-- ORGANIC MATTER -->
-      <organic>
-        <parameter name="CNRatio microbes">10</parameter>  <!-- g g-1 -->
-        <table name="CNratio" x_name="depth" x_unit="cm" y_unit="g g-1">
-          -10000 13  0 13
-        </table>
-        <parameter name="assimilation efficiency microbes">1</parameter>
-        <table name="carbon content" x_name="depth" x_unit="cm" y_unit="g g-1">
-          -200 0.005  -40 0.005  -30 0.01  -10 0.02  0 0.02
-        </table>
-        <table name="initial relative mineralisation rate" x_name="depth" x_unit="cm" y_unit="g g-1 year-1">
-          -1000 0  -25 0  -10 0.037  0 0.037
-        </table>
-        <parameter name="speed of aging">0.46</parameter>
-        <parameter name="time offset">30</parameter>  <!-- day -->
-      </organic>
+			<!-- ====== HYPOCOTYL ====== -->
+			<SimulaBase name="hypocotyl">
+				<SimulaConstant name="rootClassID" type="integer">96</SimulaConstant>
+				<SimulaBase name="branchList">
+					<SimulaBase name="basalWhorl1">
+						<SimulaConstant name="branchingFrequency" unit="cm">0.01</SimulaConstant>
+						<SimulaConstant name="branchingSpatialOffset" unit="cm">0.01</SimulaConstant>
+						<SimulaConstant name="branchingTimeOffset" type="time" unit="day">4.167</SimulaConstant>
+						<SimulaConstant name="maxNumberOfBranches" type="integer" unit="#">4</SimulaConstant>
+						<SimulaConstant name="numberOfBranches/whorl" type="integer" unit="#">4</SimulaConstant>
+					</SimulaBase>
+					<SimulaBase name="basalWhorl2">
+						<SimulaConstant name="branchingFrequency" unit="cm">0.5</SimulaConstant>
+						<SimulaConstant name="branchingSpatialOffset" unit="cm">0.3</SimulaConstant>
+						<SimulaConstant name="branchingTimeOffset" type="time" unit="day">6.25</SimulaConstant>
+						<SimulaConstant name="maxNumberOfBranches" type="integer" unit="#">4</SimulaConstant>
+						<SimulaConstant name="numberOfBranches/whorl" type="integer" unit="#">4</SimulaConstant>
+					</SimulaBase>
+					<SimulaBase name="hypocotylBornRoots">
+						<SimulaConstant name="allowBranchesToFormAboveGround" type="bool">false</SimulaConstant>
+						<SimulaConstant name="branchingDelay" unit="day">0</SimulaConstant>
+						<SimulaConstant name="branchingFrequency" unit="cm">0.4</SimulaConstant>
+						<SimulaConstant name="branchingSpatialOffset" unit="cm">0.4</SimulaConstant>
+						<SimulaConstant name="branchingTimeOffset" type="time" unit="day">10</SimulaConstant>
+						<SimulaConstant name="maxNumberOfBranches" type="integer" unit="#">10</SimulaConstant>
+					</SimulaBase>
+				</SimulaBase>
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-      <!-- PHOSPHORUS -->
-      <phosphorus>
-        <parameter name="adsorption coefficient">1333.3</parameter>  <!-- umol cm-1 -->
-        <table name="buffer power" x_name="depth" x_unit="cm">
-          -1000 400  1000 400
-        </table>
-        <table name="concentration" x_name="depth" x_unit="cm" y_unit="umol ml-1">
-          -1000 0.0645786  -30 0.0645786  -29 0.0645786  -10 0.0645786
-          -9 0.0645786   -5 0.0645786   -4 0.0645786    0 0.0645786
-          0.0001 0  1000 0
-        </table>
-        <table name="diffusion coefficient" x_name="depth" x_unit="cm" y_unit="cm2 day-1">
-          -1000 0.00019872  1000 0.00019872
-        </table>
-        <parameter name="increase time step">1.1</parameter>
-        <parameter name="longitudinal dispersivity">0</parameter>  <!-- cm -->
-        <parameter name="r1-r0">0.3</parameter>  <!-- cm -->
-        <parameter name="saturated diffusion coefficient">0.00495</parameter>  <!-- cm2 day-1 -->
-        <parameter name="transverse dispersivity">0</parameter>  <!-- cm -->
-      </phosphorus>
+			<!-- ====== PRIMARY ROOT ====== -->
+			<SimulaBase name="primaryRoot">
+				<SimulaConstant name="rootClassID" type="integer">100</SimulaConstant>
+				<SimulaBase name="branchList">
+					<SimulaBase name="lateralPrimaryRoot">
+						<SimulaConstant name="allowBranchesToFormAboveGround" type="bool">false</SimulaConstant>
+						<SimulaConstant name="branchingFrequency" unit="cm">0.1</SimulaConstant>
+						<SimulaConstant name="lengthRootTip" unit="cm">10</SimulaConstant>
+						<SimulaConstant name="numberOfBranches/whorl" type="integer" unit="#">1</SimulaConstant>
+					</SimulaBase>
+					<SimulaBase name="lateralPrimaryRootFastGrowing">
+						<SimulaConstant name="allowBranchesToFormAboveGround" type="bool">false</SimulaConstant>
+						<SimulaStochastic name="branchingFrequency" unit="cm" distribution="uniform" minimum="1" maximum="5" />
+						<SimulaConstant name="lengthRootTip" unit="cm">10</SimulaConstant>
+						<SimulaConstant name="numberOfBranches/whorl" type="integer" unit="#">1</SimulaConstant>
+					</SimulaBase>
+				</SimulaBase>
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-      <!-- POTASSIUM -->
-      <potassium>
-        <parameter name="adsorption coefficient">33.3</parameter>  <!-- umol cm-1 -->
-        <table name="buffer power" x_name="depth" x_unit="cm">
-          -1000 10  1000 10
-        </table>
-        <table name="concentration" x_name="depth" x_unit="cm" y_unit="umol ml-1">
-          -1000 0.05  -30 0.05  -29 0.15  0 0.15  1e-05 0  1000 0
-        </table>
-        <table name="diffusion coefficient" x_name="depth" x_unit="cm" y_unit="cm2 day-1">
-          -1000 0.067  1000 0.067
-        </table>
-        <parameter name="increase time step">1.01</parameter>
-        <parameter name="longitudinal dispersivity">1</parameter>  <!-- cm -->
-        <parameter name="r1-r0">1.5</parameter>  <!-- cm -->
-        <parameter name="saturated diffusion coefficient">1.56</parameter>  <!-- cm2 day-1 -->
-        <parameter name="transverse dispersivity">0.5</parameter>  <!-- cm -->
-      </potassium>
+			<!-- ====== BASAL WHORL 1 ====== -->
+			<SimulaBase name="basalWhorl1">
+				<SimulaConstant name="rootClassID" type="integer">99</SimulaConstant>
+				<SimulaBase name="branchList">
+					<SimulaBase name="lateralBasalRoots">
+						<SimulaConstant name="allowBranchesToFormAboveGround" type="bool">false</SimulaConstant>
+						<SimulaConstant name="branchingFrequency" unit="cm">0.15</SimulaConstant>
+						<SimulaConstant name="lengthRootTip" unit="cm">8</SimulaConstant>
+					</SimulaBase>
+				</SimulaBase>
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-      <!-- WATER -->
-      <water>
-        <table name="initial hydraulic head" x_name="depth" x_unit="cm" y_unit="cm">
-          -200 0    -151 -50   -50 -150  -45 -155  -40 -160
-          -35 -165  -30 -170  -25 -175  -20 -180  -15 -190
-          -10 -200   -5 -220   -2 -240   -1 -300    0 -400
-        </table>
-        <table name="residual water content" x_name="depth" x_unit="cm" y_unit="100%">
-          -300 0.067  0 0.067
-        </table>
-        <table name="saturated conductivity" x_name="depth" x_unit="cm" y_unit="cm day-1">
-          -300 10.8  0 10.8
-        </table>
-        <table name="saturated water content" x_name="depth" x_unit="cm" y_unit="100%">
-          -300 0.39  -65 0.39  -35 0.39  -25 0.43  -15 0.45  0 0.46
-        </table>
-        <table name="van genuchten:alpha" x_name="depth" x_unit="cm" y_unit="1cm-1">
-          -300 0.02  0 0.02
-        </table>
-        <table name="van genuchten:n" x_name="depth" x_unit="cm">
-          -300 1.41  0 1.41
-        </table>
-        <parameter name="volumetric water content in barber cushman">0.3</parameter>  <!-- cm3 cm-3 -->
-      </water>
+			<!-- ====== BASAL WHORL 2 ====== -->
+			<SimulaBase name="basalWhorl2">
+				<SimulaConstant name="rootClassID" type="integer">99</SimulaConstant>
+				<SimulaBase name="branchList">
+					<SimulaBase name="lateralBasalRoots">
+						<SimulaConstant name="allowBranchesToFormAboveGround" type="bool">false</SimulaConstant>
+						<SimulaConstant name="branchingFrequency" unit="cm">0.15</SimulaConstant>
+						<SimulaConstant name="lengthRootTip" unit="cm">10</SimulaConstant>
+					</SimulaBase>
+				</SimulaBase>
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-    </soil>
+			<!-- ====== BASAL WHORL 3 ====== -->
+			<SimulaBase name="basalWhorl3">
+				<SimulaConstant name="rootClassID" type="integer">99</SimulaConstant>
+				<SimulaBase name="branchList">
+					<SimulaBase name="lateralBasalRoots">
+						<SimulaConstant name="allowBranchesToFormAboveGround" type="bool">false</SimulaConstant>
+						<SimulaConstant name="branchingFrequency" unit="cm">0.15</SimulaConstant>
+						<SimulaConstant name="lengthRootTip" unit="cm">10</SimulaConstant>
+					</SimulaBase>
+				</SimulaBase>
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-  </environment>
+			<!-- ====== HYPOCOTYL BORN ROOTS ====== -->
+			<SimulaBase name="hypocotylBornRoots">
+				<SimulaConstant name="rootClassID" type="integer">98</SimulaConstant>
+				<SimulaBase name="branchList">
+					<SimulaBase name="lateralHypocotylBornRoots">
+						<SimulaConstant name="allowBranchesToFormAboveGround" type="bool">false</SimulaConstant>
+						<SimulaConstant name="branchingFrequency" unit="cm">0.4</SimulaConstant>
+						<SimulaConstant name="lengthRootTip" unit="cm">10</SimulaConstant>
+					</SimulaBase>
+				</SimulaBase>
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-  <!-- ============================================================ -->
-  <!--  ROOT TYPE PARAMETERS  (Bean - carioca - SimRoot4)           -->
-  <!-- ============================================================ -->
-  <rootTypeParameters name="Bean- carioca- sim root4">
+			<!-- ====== LATERAL PRIMARY ROOT ====== -->
+			<SimulaBase name="lateralPrimaryRoot">
+				<SimulaConstant name="rootClassID" type="integer">97</SimulaConstant>
+				<SimulaBase name="branchList">
+					<SimulaBase name="finelateral">
+						<SimulaConstant name="allowBranchesToFormAboveGround" type="bool">false</SimulaConstant>
+						<SimulaConstant name="branchingFrequency" unit="cm">0.5</SimulaConstant>
+						<SimulaConstant name="lengthRootTip" unit="cm">4</SimulaConstant>
+					</SimulaBase>
+				</SimulaBase>
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-    <!-- ====== SHARED NUTRIENT UPTAKE KINETICS (used across all root classes) ====== -->
-    <!-- Defined once here as XML entities / comments for clarity;
-         they are repeated inline per root class below as required by OSR format. -->
-    <!--
-      Nitrate:  Cmin=0.001, Imax=1.9, Km=0.0161, min_conc=600, opt_conc=1200  (umol/ml, umol/cm2/d, etc.)
-      Phosphorus: Cmin=0.0002, Efflux=1e-06, Imax=0.0555, Km=0.00545, min=30, opt=60
-      Potassium: Cmin=0.002, Efflux=1e-06, Imax=0.467, Km=0.039, min=168, opt=234
-    -->
+			<!-- ====== LATERAL PRIMARY ROOT FAST GROWING ====== -->
+			<SimulaBase name="lateralPrimaryRootFastGrowing">
+				<SimulaConstant name="rootClassID" type="integer">97</SimulaConstant>
+				<SimulaBase name="branchList">
+					<SimulaBase name="finelateralFastGrowing">
+						<SimulaConstant name="allowBranchesToFormAboveGround" type="bool">false</SimulaConstant>
+						<SimulaConstant name="branchingFrequency" unit="cm">0.55</SimulaConstant>
+						<SimulaConstant name="lengthRootTip" unit="cm">4</SimulaConstant>
+					</SimulaBase>
+				</SimulaBase>
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-    <!-- ====================================================== -->
-    <!--  HYPOCOTYL  (root class ID 96)                         -->
-    <!-- ====================================================== -->
-    <rootType name="hypocotyl">
-      <parameter name="root class ID">96</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  100 0
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">0</parameter>
-      <parameter name="density">0.094</parameter>  <!-- g cm-3 -->
-      <parameter name="diameter">0.4</parameter>  <!-- cm -->
-      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="0.5" max="0.6"/>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 1  1 3  2 3  3 1  3.3 0.5  4 0.2  5 0  1000 0
-      </table>
-      <!-- Nitrate uptake kinetics -->
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <!-- Phosphorus uptake kinetics -->
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <!-- Potassium uptake kinetics -->
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 0  100 0
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <parameter name="root hair density_base">0</parameter>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 0  100 0
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>  <!-- cm -->
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <!-- Secondary growth -->
-      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
-        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
-        18 0.0026  24 0.00285  29 0.003  100 0.003
-      </table>
-      <parameter name="secondary growth rate multiplier">0.5</parameter>
-      <!-- Secondary growth scaling: high near base for hypocotyl -->
-      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
-        0 7  2 7  10 7  1000 7
-      </table>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.01" max="0.01"/>
-      <!-- Branch list -->
-      <branchList>
-        <branch name="basal whorl1">
-          <parameter name="branching frequency">0.01</parameter>
-          <parameter name="branching spatial offset">0.01</parameter>
-          <parameter name="branching time offset">4.167</parameter>  <!-- day -->
-          <parameter name="max number of branches">4</parameter>
-          <parameter name="number of branches/whorl">4</parameter>
-        </branch>
-        <branch name="basal whorl2">
-          <parameter name="branching frequency">0.5</parameter>
-          <parameter name="branching spatial offset">0.3</parameter>
-          <parameter name="branching time offset">6.25</parameter>  <!-- day -->
-          <parameter name="max number of branches">4</parameter>
-          <parameter name="number of branches/whorl">4</parameter>
-        </branch>
-        <branch name="hypocotyl born roots">
-          <parameter name="allow branches to form above ground">0</parameter>
-          <parameter name="branching delay">0</parameter>
-          <parameter name="branching frequency">0.4</parameter>
-          <parameter name="branching spatial offset">0.4</parameter>
-          <parameter name="branching time offset">10</parameter>
-          <parameter name="max number of branches">10</parameter>
-        </branch>
-      </branchList>
-    </rootType>
+			<!-- ====== LATERAL BASAL ROOTS ====== -->
+			<SimulaBase name="lateralBasalRoots">
+				<SimulaConstant name="rootClassID" type="integer">97</SimulaConstant>
+				<SimulaBase name="branchList">
+					<SimulaBase name="finelateral">
+						<SimulaConstant name="allowBranchesToFormAboveGround" type="bool">false</SimulaConstant>
+						<SimulaConstant name="branchingFrequency" unit="cm">0.5</SimulaConstant>
+						<SimulaConstant name="lengthRootTip" unit="cm">4</SimulaConstant>
+					</SimulaBase>
+				</SimulaBase>
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-    <!-- ====================================================== -->
-    <!--  BASAL WHORL 1                                         -->
-    <!-- ====================================================== -->
-    <rootType name="basal whorl1">
-      <parameter name="root class ID">99</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">90</parameter>  <!-- degrees -->
-      <parameter name="density">0.094</parameter>  <!-- g cm-3 -->
-      <parameter name="diameter">0.068</parameter>  <!-- cm -->
-      <parameter name="gravitropism">0.002</parameter>
-      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="-0.08" max="-0.04"/>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 0.1  3 4  10 4  15 3  25 2.352  35 2.352  40 0  1000 0
-      </table>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <parameter name="regular topology">0</parameter>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 2000  10 2000  30 2000  100 2000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
-        0 0  2 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
-        18 0.0026  24 0.00285  29 0.003  100 0.003
-      </table>
-      <parameter name="secondary growth rate multiplier">0.5</parameter>
-      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
-        0 0.7  20 0.7  40 0.4  100 0.4
-      </table>
-      <parameter name="soil impedence">0.008</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.04" max="0.04"/>
-      <branchList>
-        <branch name="lateral basal roots">
-          <parameter name="allow branches to form above ground">0</parameter>
-          <parameter name="branching frequency">0.15</parameter>
-          <parameter name="length root tip">8</parameter>
-        </branch>
-      </branchList>
-    </rootType>
+			<!-- ====== LATERAL HYPOCOTYL BORN ROOTS ====== -->
+			<SimulaBase name="lateralHypocotylBornRoots">
+				<SimulaConstant name="rootClassID" type="integer">97</SimulaConstant>
+				<SimulaBase name="branchList" />
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-    <!-- ====================================================== -->
-    <!--  BASAL WHORL 2                                         -->
-    <!-- ====================================================== -->
-    <rootType name="basal whorl2">
-      <parameter name="root class ID">99</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">90</parameter>
-      <parameter name="density">0.094</parameter>
-      <parameter name="diameter">0.068</parameter>
-      <parameter name="gravitropism">0.001</parameter>
-      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="-0.04" max="-0.02"/>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 0.1  3 4  10 4  15 3  25 2.352  35 2.352  40 0  1000 0
-      </table>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <parameter name="regular topology">0</parameter>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 2000  10 2000  30 2000  100 2000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
-        0 0  2 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
-        18 0.0026  24 0.00285  29 0.003  100 0.003
-      </table>
-      <parameter name="secondary growth rate multiplier">0.5</parameter>
-      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
-        0 0.7  20 0.7  40 0.4  100 0.4
-      </table>
-      <parameter name="soil impedence">0.008</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.04" max="0.04"/>
-      <branchList>
-        <branch name="lateral basal roots">
-          <parameter name="allow branches to form above ground">0</parameter>
-          <parameter name="branching frequency">0.15</parameter>
-          <parameter name="length root tip">10</parameter>
-        </branch>
-      </branchList>
-    </rootType>
+			<!-- ====== FINELATERAL ====== -->
+			<SimulaBase name="finelateral">
+				<SimulaConstant name="rootClassID" type="integer">97</SimulaConstant>
+				<SimulaBase name="branchList" />
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-    <!-- ====================================================== -->
-    <!--  BASAL WHORL 3                                         -->
-    <!-- ====================================================== -->
-    <rootType name="basal whorl3">
-      <parameter name="root class ID">99</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">90</parameter>
-      <parameter name="density">0.094</parameter>
-      <parameter name="diameter">0.068</parameter>
-      <parameter name="gravitropism">0.0005</parameter>
-      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="-0.02" max="-0.01"/>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 0.1  2 4  10 4  15 3  25 2.352  35 2.352  40 0  1000 0
-      </table>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <parameter name="regular topology">0</parameter>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 2000  10 2000  30 2000  100 2000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
-        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
-        18 0.0026  24 0.00285  29 0.003  100 0.003
-      </table>
-      <parameter name="secondary growth rate multiplier">0.5</parameter>
-      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
-        0 0.7  20 0.7  40 0.4  100 0.4
-      </table>
-      <parameter name="soil impedence">0.008</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.04" max="0.04"/>
-      <branchList>
-        <branch name="lateral basal roots">
-          <parameter name="allow branches to form above ground">0</parameter>
-          <parameter name="branching frequency">0.15</parameter>
-          <parameter name="length root tip">10</parameter>
-        </branch>
-      </branchList>
-    </rootType>
+			<!-- ====== FINELATERAL FAST GROWING ====== -->
+			<SimulaBase name="finelateralFastGrowing">
+				<SimulaConstant name="rootClassID" type="integer">97</SimulaConstant>
+				<SimulaBase name="branchList" />
+				<SimulaConstant name="density" unit="g/cm3">0.094</SimulaConstant>
+			</SimulaBase>
 
-    <!-- ====================================================== -->
-    <!--  HYPOCOTYL BORN ROOTS  (ID 98)                         -->
-    <!-- ====================================================== -->
-    <rootType name="hypocotyl born roots">
-      <parameter name="root class ID">98</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">85</parameter>
-      <parameter name="density">0.094</parameter>
-      <parameter name="diameter">0.064</parameter>
-      <parameter name="gravitropism">0</parameter>
-      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="-0.002" max="0"/>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 1  25 0.8  35 0  60 0
-      </table>
-      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.5" max="1.5" mean="1" stdev="0.1"/>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <parameter name="regular topology">0</parameter>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 3000  10 3000  30 3000  100 3000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
-        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
-        18 0.0026  24 0.00285  29 0.003  100 0.003
-      </table>
-      <parameter name="secondary growth rate multiplier">0.5</parameter>
-      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
-        0 0.6  50 0.2  100 0.2
-      </table>
-      <parameter name="soil impedence">0.003</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.04" max="0.04"/>
-      <branchList>
-        <branch name="lateral hypocotyl born roots">
-          <parameter name="allow branches to form above ground">0</parameter>
-          <parameter name="branching frequency">0.4</parameter>
-          <parameter name="length root tip">10</parameter>
-        </branch>
-      </branchList>
-    </rootType>
+			<!-- ====== GROWTH RATES (per root type) ====== -->
+			<SimulaDirective path="hypocotyl">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 1 1 3 2 3 3 1 3.3 0.5 4 0.2 5 0 1000 0</SimulaTable>
+				<SimulaConstant name="diameter" unit="cm">0.4</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="primaryRoot">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 2.357 10 2.357 15 2.357 250 2.357</SimulaTable>
+				<SimulaConstant name="diameter" unit="cm">0.09</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl1">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0.1 3 4 10 4 15 3 25 2.352 35 2.352 40 0 1000 0</SimulaTable>
+				<SimulaConstant name="diameter" unit="cm">0.068</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl2">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0.1 3 4 10 4 15 3 25 2.352 35 2.352 40 0 1000 0</SimulaTable>
+				<SimulaConstant name="diameter" unit="cm">0.068</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl3">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0.1 2 4 10 4 15 3 25 2.352 35 2.352 40 0 1000 0</SimulaTable>
+				<SimulaConstant name="diameter" unit="cm">0.068</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotylBornRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 1 25 0.8 35 0 60 0</SimulaTable>
+				<SimulaStochastic name="longitudinalGrowthRateMultiplier" unit="cm" distribution="normal" minimum="0.5" maximum="1.5" mean="1" stdev="0.1" />
+				<SimulaConstant name="diameter" unit="cm">0.064</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="lateralBasalRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0.768 2 0.768 4 0.768 6 0.2 10 0 1000 0</SimulaTable>
+				<SimulaStochastic name="longitudinalGrowthRateMultiplier" unit="cm" distribution="normal" minimum="0.6" maximum="1.0" mean="0.8" stdev="0.1" />
+				<SimulaConstant name="diameter" unit="cm">0.03</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="lateralHypocotylBornRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0.768 2 0.768 4 0.768 6 0.2 10 0 1000 0</SimulaTable>
+				<SimulaStochastic name="longitudinalGrowthRateMultiplier" unit="cm" distribution="normal" minimum="0.6" maximum="1.0" mean="0.8" stdev="0.1" />
+				<SimulaConstant name="diameter" unit="cm">0.03</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRoot">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0.768 2 0.768 4 0.768 6 0.768 10 0 1000 0</SimulaTable>
+				<SimulaStochastic name="longitudinalGrowthRateMultiplier" unit="cm" distribution="normal" minimum="0.8" maximum="1.2" mean="1.0" stdev="0.1" />
+				<SimulaConstant name="diameter" unit="cm">0.03</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRootFastGrowing">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0.768 2 0.768 15 0.768 20 0 1000 0</SimulaTable>
+				<SimulaStochastic name="longitudinalGrowthRateMultiplier" unit="cm" distribution="normal" minimum="1.4" maximum="1.8" mean="1.6" stdev="0.2" />
+				<SimulaConstant name="diameter" unit="cm">0.03</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="finelateral">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0.2 3 0.2 5 0 100 0</SimulaTable>
+				<SimulaStochastic name="longitudinalGrowthRateMultiplier" unit="cm" distribution="normal" minimum="0.3" maximum="1.0" mean="0.6" stdev="0.1" />
+				<SimulaConstant name="diameter" unit="cm">0.01</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="finelateralFastGrowing">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="growthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0.5 1 0.8 2 1 3 1 4 0 100 0</SimulaTable>
+				<SimulaStochastic name="longitudinalGrowthRateMultiplier" unit="cm" distribution="normal" minimum="0.3" maximum="1.0" mean="0.6" stdev="0.1" />
+				<SimulaConstant name="diameter" unit="cm">0.015</SimulaConstant>
+			</SimulaDirective>
 
-    <!-- ====================================================== -->
-    <!--  LATERAL BASAL ROOTS  (ID 97)                          -->
-    <!-- ====================================================== -->
-    <rootType name="lateral basal roots">
-      <parameter name="root class ID">97</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">75</parameter>
-      <parameter name="density">0.094</parameter>
-      <parameter name="diameter">0.03</parameter>
-      <parameter name="gravitropism">0</parameter>
-      <parameter name="gravitropism.v2">0 0 0</parameter>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 0.768  2 0.768  4 0.768  6 0.2  10 0  1000 0
-      </table>
-      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.6" max="1.0" mean="0.8" stdev="0.1"/>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <parameter name="regular topology">0</parameter>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 3000  100 3000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <parameter name="soil impedence">0.02</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.1" max="0.1"/>
-      <parameter name="topology offset">0</parameter>
-      <branchList>
-        <branch name="finelateral">
-          <parameter name="allow branches to form above ground">0</parameter>
-          <parameter name="branching frequency">0.5</parameter>
-          <parameter name="length root tip">4</parameter>
-        </branch>
-      </branchList>
-    </rootType>
+			<!-- ====== AERENCHYMA (per root type) ====== -->
+			<SimulaDirective path="hypocotyl">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 100 0
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="primaryRoot">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl1">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl2">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl3">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotylBornRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralBasalRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralHypocotylBornRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRoot">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRootFastGrowing">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="finelateral">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="finelateralFastGrowing">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="aerenchymaFormation" unit_column2="100%" garbageCollectionOff="true">0 0 3 0 5 0.05 10 0.1 20 0.268 1000 0.268
+					<SimulaConstant name="multiplier">1</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="aerenchymaFormation" unit_column1="100%" name_column2="reductionInRespirationDueToAerenchyma" unit_column2="100%" garbageCollectionOff="true">0 0 0.3 0.7 0.6 1</SimulaTable>
+			</SimulaDirective>
 
-    <!-- ====================================================== -->
-    <!--  LATERAL HYPOCOTYL BORN ROOTS  (ID 97)                 -->
-    <!-- ====================================================== -->
-    <rootType name="lateral hypocotyl born roots">
-      <parameter name="root class ID">97</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">75</parameter>
-      <parameter name="density">0.094</parameter>
-      <parameter name="diameter">0.03</parameter>
-      <parameter name="gravitropism">0</parameter>
-      <parameter name="gravitropism.v2">0 0 0</parameter>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 0.768  2 0.768  4 0.768  6 0.2  10 0  1000 0
-      </table>
-      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.6" max="1.0" mean="0.8" stdev="0.1"/>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <parameter name="regular topology">0</parameter>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 3000  100 3000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <parameter name="soil impedence">0.015</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.1" max="0.1"/>
-      <parameter name="topology offset">0</parameter>
-    </rootType>
+			<!-- ====== RESPIRATION ====== -->
+			<SimulaDirective path="hypocotyl">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="primaryRoot">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl1">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl2">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl3">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotylBornRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralBasalRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralHypocotylBornRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRoot">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRootFastGrowing">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="finelateral">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="finelateralFastGrowing">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeRespiration" unit_column2="g/g/day" garbageCollectionOff="true">0 0.09 2 0.04 6 0.04 1000 0.04</SimulaTable>
+			</SimulaDirective>
 
-    <!-- ====================================================== -->
-    <!--  PRIMARY ROOT  (ID 100)                                -->
-    <!-- ====================================================== -->
-    <rootType name="primary root">
-      <parameter name="root class ID">100</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">0</parameter>
-      <parameter name="density">0.094</parameter>
-      <parameter name="diameter">0.09</parameter>
-      <parameter name="gravitropism">0.011</parameter>
-      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="-0.015" max="-0.005"/>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 2.357  10 2.357  15 2.357  250 2.357
-      </table>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">16</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 2000  10 2000  30 2000  100 2000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
-        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
-        18 0.0026  24 0.00285  29 0.003  100 0.003
-      </table>
-      <parameter name="secondary growth rate multiplier">0.5</parameter>
-      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
-        0 4  0.5 4  1 4  20 4  40 2  100 2
-      </table>
-      <parameter name="soil impedence">0.01</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.05" max="0.05"/>
-      <branchList>
-        <branch name="lateral primary root">
-          <parameter name="allow branches to form above ground">0</parameter>
-          <parameter name="branching frequency">0.1</parameter>
-          <parameter name="length root tip">10</parameter>
-          <parameter name="number of branches/whorl">1</parameter>
-        </branch>
-        <branch name="lateral primary root fast growing">
-          <parameter name="allow branches to form above ground">0</parameter>
-          <distribution name="branching frequency" type="uniform" unit="cm" min="1" max="5"/>
-          <parameter name="length root tip">10</parameter>
-          <parameter name="number of branches/whorl">1</parameter>
-        </branch>
-      </branchList>
-    </rootType>
+			<!-- ====== EXUDATES ====== -->
+			<SimulaDirective path="hypocotyl">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 0 100 0</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="primaryRoot">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl1">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl2">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl3">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotylBornRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralBasalRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralHypocotylBornRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRoot">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRootFastGrowing">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="finelateral">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="finelateralFastGrowing">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="relativeCarbonCostOfExudation" unit_column2="g/cm/day" garbageCollectionOff="true">0 1.915e-05 1.8 1.511e-05 3.1 1.699e-05 4.4 1.362e-05 100 1.362e-05</SimulaTable>
+			</SimulaDirective>
 
-    <!-- ====================================================== -->
-    <!--  LATERAL PRIMARY ROOT  (ID 97)                         -->
-    <!-- ====================================================== -->
-    <rootType name="lateral primary root">
-      <parameter name="root class ID">97</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">75</parameter>
-      <parameter name="density">0.094</parameter>
-      <parameter name="diameter">0.03</parameter>
-      <parameter name="gravitropism">0</parameter>
-      <parameter name="gravitropism.v2">0 0 0</parameter>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 0.768  2 0.768  4 0.768  6 0.768  10 0  1000 0
-      </table>
-      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.8" max="1.2" mean="1.0" stdev="0.1"/>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <parameter name="regular topology">0</parameter>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 2000  10 2000  30 2000  100 2000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
-        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
-        18 0.0026  24 0.00285  29 0.003  100 0.003
-      </table>
-      <parameter name="secondary growth rate multiplier">0.5</parameter>
-      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
-        0 0.1  50 0.1  100 0.1
-      </table>
-      <parameter name="soil impedence">0.02</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.2" max="0.2"/>
-      <parameter name="topology offset">0</parameter>
-      <branchList>
-        <branch name="finelateral">
-          <parameter name="allow branches to form above ground">0</parameter>
-          <parameter name="branching frequency">0.5</parameter>
-          <parameter name="length root tip">4</parameter>
-        </branch>
-      </branchList>
-    </rootType>
+			<!-- ====== ROOT HAIRS ====== -->
+			<SimulaDirective path="hypocotyl">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 0 100 0</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="primaryRoot">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 2000 10 2000 30 2000 100 2000</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl1">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 2000 10 2000 30 2000 100 2000</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl2">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 2000 10 2000 30 2000 100 2000</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl3">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 2000 10 2000 30 2000 100 2000</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotylBornRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 3000 10 3000 30 3000 100 3000</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralBasalRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 3000 100 3000</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralHypocotylBornRoots">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 3000 100 3000</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRoot">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 2000 10 2000 30 2000 100 2000</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRootFastGrowing">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 3000 100 3000</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="finelateral">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 3000 100 3000</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="finelateralFastGrowing">
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairLength" unit_column2="cm" garbageCollectionOff="true">0 0 1 0 2 0.03 100 0.03</SimulaTable>
+				<SimulaConstant name="rootHairDiameter" unit="cm">0.0005</SimulaConstant>
+				<SimulaTable name_column1="time since creation" unit_column1="day" name_column2="rootHairDensity" unit_column2="#/cm2" garbageCollectionOff="true">0 3000 100 3000</SimulaTable>
+			</SimulaDirective>
 
-    <!-- ====================================================== -->
-    <!--  LATERAL PRIMARY ROOT FAST GROWING  (ID 97)            -->
-    <!-- ====================================================== -->
-    <rootType name="lateral primary root fast growing">
-      <parameter name="root class ID">97</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">75</parameter>
-      <parameter name="density">0.094</parameter>
-      <parameter name="diameter">0.03</parameter>
-      <parameter name="gravitropism">0</parameter>
-      <parameter name="gravitropism.v2">0 0 0</parameter>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 0.768  2 0.768  15 0.768  20 0  1000 0
-      </table>
-      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="1.4" max="1.8" mean="1.6" stdev="0.2"/>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <parameter name="regular topology">0</parameter>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 3000  100 3000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
-        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
-        18 0.0026  24 0.00285  29 0.003  100 0.003
-      </table>
-      <parameter name="secondary growth rate multiplier">0.5</parameter>
-      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
-        0 0.3  50 0.2  100 0.2
-      </table>
-      <parameter name="soil impedence">0.02</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.1" max="0.1"/>
-      <parameter name="topology offset">0</parameter>
-      <branchList>
-        <branch name="finelateral fast growing">
-          <parameter name="allow branches to form above ground">0</parameter>
-          <parameter name="branching frequency">0.55</parameter>
-          <parameter name="length root tip">4</parameter>
-        </branch>
-      </branchList>
-    </rootType>
+			<!-- ====== ANGLES, TOPOLOGY, BOUNDARIES ====== -->
+			<SimulaDirective path="hypocotyl">
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaStochastic name="gravitropism.v2" unit="cm" type="coordinate" distribution="uniform" minimum="0.5" maximum="0.6" />
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.01" maximum="0.01" />
+				<SimulaConstant name="topBoundary" type="bool">0</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="primaryRoot">
+				<SimulaConstant name="branchingAngle" unit="degrees">0</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">16</SimulaConstant>
+				<SimulaConstant name="gravitropism">0.011</SimulaConstant>
+				<SimulaStochastic name="gravitropism.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.015" maximum="-0.005" />
+				<SimulaConstant name="soilImpedence">0.01</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.05" maximum="0.05" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl1">
+				<SimulaConstant name="branchingAngle" unit="degrees">90</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaConstant name="regularTopology" type="integer">0</SimulaConstant>
+				<SimulaConstant name="gravitropism">0.002</SimulaConstant>
+				<SimulaStochastic name="gravitropism.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.08" maximum="-0.04" />
+				<SimulaConstant name="soilImpedence">0.008</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.04" maximum="0.04" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl2">
+				<SimulaConstant name="branchingAngle" unit="degrees">90</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaConstant name="regularTopology" type="integer">0</SimulaConstant>
+				<SimulaConstant name="gravitropism">0.001</SimulaConstant>
+				<SimulaStochastic name="gravitropism.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.04" maximum="-0.02" />
+				<SimulaConstant name="soilImpedence">0.008</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.04" maximum="0.04" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl3">
+				<SimulaConstant name="branchingAngle" unit="degrees">90</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaConstant name="regularTopology" type="integer">0</SimulaConstant>
+				<SimulaConstant name="gravitropism">0.0005</SimulaConstant>
+				<SimulaStochastic name="gravitropism.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.02" maximum="-0.01" />
+				<SimulaConstant name="soilImpedence">0.008</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.04" maximum="0.04" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotylBornRoots">
+				<SimulaConstant name="branchingAngle" unit="degrees">85</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaConstant name="regularTopology" type="integer">0</SimulaConstant>
+				<SimulaConstant name="gravitropism">0</SimulaConstant>
+				<SimulaStochastic name="gravitropism.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.002" maximum="0" />
+				<SimulaConstant name="soilImpedence">0.003</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.04" maximum="0.04" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="lateralBasalRoots">
+				<SimulaConstant name="branchingAngle" unit="degrees">75</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaConstant name="regularTopology" type="integer">0</SimulaConstant>
+				<SimulaConstant name="topologyOffset" type="integer">0</SimulaConstant>
+				<SimulaConstant name="gravitropism">0</SimulaConstant>
+				<SimulaConstant name="gravitropism.v2" type="coordinate">0 0 0</SimulaConstant>
+				<SimulaConstant name="soilImpedence">0.02</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.1" maximum="0.1" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="lateralHypocotylBornRoots">
+				<SimulaConstant name="branchingAngle" unit="degrees">75</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaConstant name="regularTopology" type="integer">0</SimulaConstant>
+				<SimulaConstant name="topologyOffset" type="integer">0</SimulaConstant>
+				<SimulaConstant name="gravitropism">0</SimulaConstant>
+				<SimulaConstant name="gravitropism.v2" type="coordinate">0 0 0</SimulaConstant>
+				<SimulaConstant name="soilImpedence">0.015</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.1" maximum="0.1" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRoot">
+				<SimulaConstant name="branchingAngle" unit="degrees">75</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaConstant name="regularTopology" type="integer">0</SimulaConstant>
+				<SimulaConstant name="topologyOffset" type="integer">0</SimulaConstant>
+				<SimulaConstant name="gravitropism">0</SimulaConstant>
+				<SimulaConstant name="gravitropism.v2" type="coordinate">0 0 0</SimulaConstant>
+				<SimulaConstant name="soilImpedence">0.02</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.2" maximum="0.2" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRootFastGrowing">
+				<SimulaConstant name="branchingAngle" unit="degrees">75</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaConstant name="regularTopology" type="integer">0</SimulaConstant>
+				<SimulaConstant name="topologyOffset" type="integer">0</SimulaConstant>
+				<SimulaConstant name="gravitropism">0</SimulaConstant>
+				<SimulaConstant name="gravitropism.v2" type="coordinate">0 0 0</SimulaConstant>
+				<SimulaConstant name="soilImpedence">0.02</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.1" maximum="0.1" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="finelateral">
+				<SimulaConstant name="branchingAngle" unit="degrees">75</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaConstant name="regularTopology" type="integer">0</SimulaConstant>
+				<SimulaConstant name="topologyOffset" type="integer">0</SimulaConstant>
+				<SimulaConstant name="gravitropism">0</SimulaConstant>
+				<SimulaConstant name="gravitropism.v2" type="coordinate">0 0 0</SimulaConstant>
+				<SimulaConstant name="soilImpedence">0.5</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.1" maximum="0.1" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
+			<SimulaDirective path="finelateralFastGrowing">
+				<SimulaConstant name="branchingAngle" unit="degrees">75</SimulaConstant>
+				<SimulaConstant name="numberOfXylemPoles" type="integer">4</SimulaConstant>
+				<SimulaConstant name="regularTopology" type="integer">0</SimulaConstant>
+				<SimulaConstant name="topologyOffset" type="integer">0</SimulaConstant>
+				<SimulaConstant name="gravitropism">0</SimulaConstant>
+				<SimulaConstant name="gravitropism.v2" type="coordinate">0 0 0</SimulaConstant>
+				<SimulaConstant name="soilImpedence">0.5</SimulaConstant>
+				<SimulaStochastic name="soilImpedence.v2" unit="cm" type="coordinate" distribution="uniform" minimum="-0.1" maximum="0.1" />
+				<SimulaConstant name="topBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bottomBoundary" type="bool">1</SimulaConstant>
+				<SimulaConstant name="bounceOfTheSide" type="bool">1</SimulaConstant>
+			</SimulaDirective>
 
-    <!-- ====================================================== -->
-    <!--  FINELATERAL  (ID 97)                                  -->
-    <!-- ====================================================== -->
-    <rootType name="finelateral">
-      <parameter name="root class ID">97</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">75</parameter>
-      <parameter name="density">0.094</parameter>
-      <parameter name="diameter">0.01</parameter>
-      <parameter name="gravitropism">0</parameter>
-      <parameter name="gravitropism.v2">0 0 0</parameter>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 0.2  3 0.2  5 0  100 0
-      </table>
-      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.3" max="1.0" mean="0.6" stdev="0.1"/>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <parameter name="regular topology">0</parameter>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 3000  100 3000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <parameter name="soil impedence">0.5</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.1" max="0.1"/>
-      <parameter name="topology offset">0</parameter>
-    </rootType>
+			<!-- ====== SECONDARY GROWTH (per root type) ====== -->
+			<SimulaDirective path="hypocotyl">
+				<SimulaTable name_column1="root segment age" unit_column1="day" name_column2="secondaryGrowthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0 4 0.0005 5 0.001 7 0.0015 11 0.002 13 0.0023 18 0.0026 24 0.00285 29 0.003 100 0.003
+					<SimulaConstant name="multiplier">0.5</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="distance to base of the root" unit_column1="cm" name_column2="secondaryGrowthScalingFactor" unit_column2="100%" garbageCollectionOff="true">0 7 2 7 10 7 1000 7</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="primaryRoot">
+				<SimulaTable name_column1="root segment age" unit_column1="day" name_column2="secondaryGrowthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0 4 0.0005 5 0.001 7 0.0015 11 0.002 13 0.0023 18 0.0026 24 0.00285 29 0.003 100 0.003
+					<SimulaConstant name="multiplier">0.5</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="distance to base of the root" unit_column1="cm" name_column2="secondaryGrowthScalingFactor" unit_column2="100%" garbageCollectionOff="true">0 4 0.5 4 1 4 20 4 40 2 100 2</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl1">
+				<SimulaTable name_column1="root segment age" unit_column1="day" name_column2="secondaryGrowthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0 2 0 4 0.0005 5 0.001 7 0.0015 11 0.002 13 0.0023 18 0.0026 24 0.00285 29 0.003 100 0.003
+					<SimulaConstant name="multiplier">0.5</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="distance to base of the root" unit_column1="cm" name_column2="secondaryGrowthScalingFactor" unit_column2="100%" garbageCollectionOff="true">0 0.7 20 0.7 40 0.4 100 0.4</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl2">
+				<SimulaTable name_column1="root segment age" unit_column1="day" name_column2="secondaryGrowthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0 2 0 4 0.0005 5 0.001 7 0.0015 11 0.002 13 0.0023 18 0.0026 24 0.00285 29 0.003 100 0.003
+					<SimulaConstant name="multiplier">0.5</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="distance to base of the root" unit_column1="cm" name_column2="secondaryGrowthScalingFactor" unit_column2="100%" garbageCollectionOff="true">0 0.7 20 0.7 40 0.4 100 0.4</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl3">
+				<SimulaTable name_column1="root segment age" unit_column1="day" name_column2="secondaryGrowthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0 4 0.0005 5 0.001 7 0.0015 11 0.002 13 0.0023 18 0.0026 24 0.00285 29 0.003 100 0.003
+					<SimulaConstant name="multiplier">0.5</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="distance to base of the root" unit_column1="cm" name_column2="secondaryGrowthScalingFactor" unit_column2="100%" garbageCollectionOff="true">0 0.7 20 0.7 40 0.4 100 0.4</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotylBornRoots">
+				<SimulaTable name_column1="root segment age" unit_column1="day" name_column2="secondaryGrowthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0 4 0.0005 5 0.001 7 0.0015 11 0.002 13 0.0023 18 0.0026 24 0.00285 29 0.003 100 0.003
+					<SimulaConstant name="multiplier">0.5</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="distance to base of the root" unit_column1="cm" name_column2="secondaryGrowthScalingFactor" unit_column2="100%" garbageCollectionOff="true">0 0.6 50 0.2 100 0.2</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRoot">
+				<SimulaTable name_column1="root segment age" unit_column1="day" name_column2="secondaryGrowthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0 4 0.0005 5 0.001 7 0.0015 11 0.002 13 0.0023 18 0.0026 24 0.00285 29 0.003 100 0.003
+					<SimulaConstant name="multiplier">0.5</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="distance to base of the root" unit_column1="cm" name_column2="secondaryGrowthScalingFactor" unit_column2="100%" garbageCollectionOff="true">0 0.1 50 0.1 100 0.1</SimulaTable>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRootFastGrowing">
+				<SimulaTable name_column1="root segment age" unit_column1="day" name_column2="secondaryGrowthRate" unit_column2="cm/day" garbageCollectionOff="true">0 0 4 0.0005 5 0.001 7 0.0015 11 0.002 13 0.0023 18 0.0026 24 0.00285 29 0.003 100 0.003
+					<SimulaConstant name="multiplier">0.5</SimulaConstant>
+				</SimulaTable>
+				<SimulaTable name_column1="distance to base of the root" unit_column1="cm" name_column2="secondaryGrowthScalingFactor" unit_column2="100%" garbageCollectionOff="true">0 0.3 50 0.2 100 0.2</SimulaTable>
+			</SimulaDirective>
 
-    <!-- ====================================================== -->
-    <!--  FINELATERAL FAST GROWING  (ID 97)                     -->
-    <!-- ====================================================== -->
-    <rootType name="finelateral fast growing">
-      <parameter name="root class ID">97</parameter>
-      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
-      </table>
-      <parameter name="bottom boundary">1</parameter>
-      <parameter name="bounce of the side">1</parameter>
-      <parameter name="top boundary">1</parameter>
-      <parameter name="branching angle">75</parameter>
-      <parameter name="density">0.094</parameter>
-      <parameter name="diameter">0.015</parameter>
-      <parameter name="gravitropism">0</parameter>
-      <parameter name="gravitropism.v2">0 0 0</parameter>
-      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
-        0 0.5  1 0.8  2 1  3 1  4 0  100 0
-      </table>
-      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.3" max="1.0" mean="0.6" stdev="0.1"/>
-      <nitrate>
-        <parameter name="Cmin">0.001</parameter>
-        <parameter name="Imax">1.9</parameter>
-        <parameter name="Km">0.0161</parameter>
-        <parameter name="minimal nutrient concentration">600</parameter>
-        <parameter name="optimal nutrient concentration">1200</parameter>
-      </nitrate>
-      <parameter name="number of xylem poles">4</parameter>
-      <phosphorus>
-        <parameter name="Cmin">0.0002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.0555</parameter>
-        <parameter name="Km">0.00545</parameter>
-        <parameter name="minimal nutrient concentration">30</parameter>
-        <parameter name="optimal nutrient concentration">60</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="Cmin">0.002</parameter>
-        <parameter name="Efflux">1e-06</parameter>
-        <parameter name="Imax">0.467</parameter>
-        <parameter name="Km">0.039</parameter>
-        <parameter name="minimal nutrient concentration">168</parameter>
-        <parameter name="optimal nutrient concentration">234</parameter>
-      </potassium>
-      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
-        0 0  0.3 0.7  0.6 1
-      </table>
-      <parameter name="regular topology">0</parameter>
-      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
-        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
-      </table>
-      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
-        0 0.09  2 0.04  6 0.04  1000 0.04
-      </table>
-      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
-        0 3000  100 3000
-      </table>
-      <parameter name="root hair diameter">0.0005</parameter>
-      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
-        0 0  1 0  2 0.03  100 0.03
-      </table>
-      <parameter name="soil impedence">0.5</parameter>
-      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.1" max="0.1"/>
-      <parameter name="topology offset">0</parameter>
-    </rootType>
+			<!-- ====== RESOURCES ====== -->
+			<SimulaBase name="resources">
+				<SimulaConstant name="carbonCostOfNitrateUptake" unit="g/uMol">1.392e-05</SimulaConstant>
+				<SimulaConstant name="carbonCostOfBiologicalNitrogenFixation" unit="g/uMol">3.95e-05</SimulaConstant>
+				<SimulaConstant name="relativeRelianceOnBNF" unit="100%">0.3</SimulaConstant>
+				<SimulaConstant name="maxCarbonAllocation2SecondaryGrowth" unit="100%">0.7</SimulaConstant>
+				<SimulaConstant name="maxCarbonAllocation2Shoot" unit="100%">0.85</SimulaConstant>
+				<SimulaConstant name="seedMass" unit="g">0.2</SimulaConstant>
+				<SimulaConstant name="seedReserveDuration" unit="day" type="time">25</SimulaConstant>
+				<SimulaTable name_column1="time" unit_column1="day" name_column2="reserveAllocationRate" unit_column2="100%/day" garbageCollectionOff="true">0 0.4 2 0.4 3 0.4 4 0.4 1000 0.4</SimulaTable>
+				<SimulaTable name_column1="time" unit_column1="day" name_column2="carbonAllocation2RootsFactor" unit_column2="100%" garbageCollectionOff="true">0 1 1 0.5 5 0.2 1000 0.2</SimulaTable>
+				<SimulaTable name_column1="time" unit_column1="day" name_column2="carbonAllocation2LeafsFactor" unit_column2="100%" garbageCollectionOff="true">0 0.7 10 0.65 30 0.65 40 0.65 60 0.4</SimulaTable>
+				<SimulaConstant name="CtoDryWeightRatio" unit="100%">0.45</SimulaConstant>
+			</SimulaBase>
 
-    <!-- ====================================================== -->
-    <!--  RESOURCES (carbon, shoot, whole-plant)                -->
-    <!-- ====================================================== -->
-    <resources>
-      <parameter name="Cto dry weight ratio">0.45</parameter>  <!-- 100% -->
-      <table name="carbon allocation to leafs factor" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 0.7  10 0.65  30 0.65  40 0.65  60 0.4
-      </table>
-      <table name="carbon allocation to roots factor" x_name="time since creation" x_unit="day" y_unit="100%">
-        0 1  1 0.5  5 0.2  1000 0.2
-      </table>
-      <parameter name="carbon cost of biological nitrogen fixation">3.95e-05</parameter>  <!-- g umol-1 -->
-      <parameter name="carbon cost of nitrate uptake">1.392e-05</parameter>  <!-- g umol-1 -->
-      <parameter name="max carbon allocation to secondary growth">0.7</parameter>  <!-- 100% -->
-      <parameter name="max carbon allocation to shoot">0.85</parameter>  <!-- 100% -->
-      <nitrate>
-        <parameter name="initial nutrient uptake">714</parameter>  <!-- umol -->
-      </nitrate>
-      <phosphorus>
-        <parameter name="initial nutrient uptake">39</parameter>  <!-- umol -->
-      </phosphorus>
-      <potassium>
-        <parameter name="initial nutrient uptake">45</parameter>  <!-- umol -->
-      </potassium>
-      <parameter name="relative reliance on BNF">0.3</parameter>  <!-- 100% -->
-      <table name="reserve allocation rate" x_name="time since creation" x_unit="day" y_unit="100% day-1">
-        0 0.4  2 0.4  3 0.4  4 0.4  1000 0.4
-      </table>
-      <parameter name="seed size">0.2</parameter>  <!-- g -->
-    </resources>
+			<!-- ====== NUTRIENT UPTAKE KINETICS: PHOSPHORUS ====== -->
+			<SimulaDirective path="resources">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="initialNutrientUptake" unit="uMol">39</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="shoot">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="leafOptimalNutrientConcentration" unit="uMol/g">100</SimulaConstant>
+					<SimulaConstant name="leafMinimalNutrientConcentration" unit="uMol/g">50</SimulaConstant>
+					<SimulaConstant name="stemOptimalNutrientConcentration" unit="uMol/g">50</SimulaConstant>
+					<SimulaConstant name="stemMinimalNutrientConcentration" unit="uMol/g">25</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotyl">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="primaryRoot">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl1">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl2">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl3">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotylBornRoots">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRoot">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRootFastGrowing">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="lateralBasalRoots">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="lateralHypocotylBornRoots">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="finelateral">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="finelateralFastGrowing">
+				<SimulaBase name="phosphorus">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">60</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">30</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">0.0555</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.00545</SimulaConstant>
+					<SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.0002</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
 
-    <!-- ====================================================== -->
-    <!--  SHOOT                                                  -->
-    <!-- ====================================================== -->
-    <shoot>
-      <parameter name="aerenchyma photosynthesis mitigation">0.5</parameter>
-      <parameter name="area per plant">660</parameter>  <!-- cm2 -->
-      <parameter name="extinction coefficient">0.9</parameter>
-      <!-- Leaf area expansion rate: large table from supplemental data -->
-      <table name="leaf area expantion rate" x_name="time" x_unit="day" y_unit="cm2 day-1">
-        0 0   2 0   3 3   4 5   6 5   7.04 3.91   7.29 4.21   7.55 4.52
-        7.8 4.85   8.05 5.19   8.3 5.54   8.56 5.92   8.81 6.31   9.06 6.72
-        9.31 7.14   9.57 7.59   9.82 8.06   10.07 8.55   10.32 9.06   10.58 9.59
-        10.83 10.15   11.08 10.74   11.33 11.35   11.59 11.99   11.84 12.66   12.09 13.36
-        12.34 14.09   12.6 14.85   12.85 15.65   13.1 16.49   13.35 17.37   13.61 18.28
-        13.86 19.24   14.11 20.24   14.36 21.29   14.62 22.39   14.87 23.53   15.12 24.73
-        15.37 25.98   15.63 27.3   15.88 28.67   16.13 30.1   16.38 31.6   16.64 33.17
-        16.89 34.81   17.14 36.53   17.39 38.32   17.65 40.2   17.9 42.16   18.15 44.21
-        18.4 46.36   18.66 48.61   18.91 50.96   19.16 53.41   19.41 55.98   19.67 58.67
-        19.92 61.48   20.17 64.42   20.42 67.49   20.68 70.71   20.93 74.07   21.18 77.59
-        21.43 81.27   21.69 85.12   21.94 89.14   22.19 93.35   22.44 97.75   22.7 102.35
-        22.95 107.17   23.2 112.2   23.45 117.47   23.71 122.98   23.96 128.74   24.21 134.76
-        24.46 141.06   24.72 147.65   24.97 154.55   25.29 156.06   25.66 154.09   26.02 152.11
-        26.38 150.11   26.74 148.1   27.1 146.08   27.46 144.05   27.83 142.02   28.19 139.98
-        28.55 137.94   28.91 135.9   29.27 133.85   29.63 131.81   29.99 129.77   30.36 127.73
-        30.72 125.7   31.08 123.67   31.44 121.65   31.8 119.64   32.16 117.64   32.52 115.65
-        32.89 113.67   33.25 111.71   33.61 109.75   33.97 107.81   34.33 105.89   34.69 103.98
-        35.06 102.09   35.42 100.21   35.78 98.36   36.14 96.52   36.5 94.7   36.86 92.9
-        37.22 91.12   37.59 89.36   37.95 87.62   38.31 85.9   38.67 84.2   39.03 82.53
-        39.39 80.87   39.76 79.24   40.12 77.63   40.48 76.05   40.84 74.49   41.2 72.95
-        41.56 71.43   41.92 69.94   42.29 68.47   42.65 67.02   43.01 65.59   43.37 64.19
-        43.73 62.82   44.09 61.46   44.45 60.13   44.82 58.82   45.18 57.53   45.54 56.27
-        45.9 55.03   46.26 53.81   46.62 52.61   46.99 51.44   47.35 50.29   47.71 49.16
-        48.07 48.05   48.43 46.96   48.79 45.89   49.15 44.84   49.52 43.82   49.88 42.81
-        50.24 41.83   50.6 40.86   50.96 39.91   51.32 38.99   51.69 38.08   52.05 37.19
-        52.41 36.32   52.77 35.47   53.13 34.63   53.49 33.82   53.85 33.02   54.22 32.23
-        54.58 31.47   54.94 30.72   55.3 29.99   55.66 29.27   56.02 28.57   56.38 27.88
-        56.75 27.21   57.11 26.56   57.47 25.92   57.83 25.29   58.19 24.68   58.55 24.08
-        58.92 23.49   59.28 22.92   59.64 22.36
-      </table>
-      <parameter name="light use efficiency">3.8e-07</parameter>  <!-- g umol-1 -->
-      <nitrate>
-        <parameter name="leaf minimal nutrient concentration">1300</parameter>   <!-- umol g-1 -->
-        <parameter name="leaf optimal nutrient concentration">2600</parameter>
-        <parameter name="stem minimal nutrient concentration">700</parameter>
-        <parameter name="stem optimal nutrient concentration">1300</parameter>
-      </nitrate>
-      <phosphorus>
-        <parameter name="leaf minimal nutrient concentration">50</parameter>   <!-- umol g-1 -->
-        <parameter name="leaf optimal nutrient concentration">100</parameter>
-        <parameter name="stem minimal nutrient concentration">25</parameter>
-        <parameter name="stem optimal nutrient concentration">50</parameter>
-      </phosphorus>
-      <potassium>
-        <parameter name="leaf minimal nutrient concentration">273</parameter>   <!-- umol g-1 -->
-        <parameter name="leaf optimal nutrient concentration">430</parameter>
-        <parameter name="stem minimal nutrient concentration">100</parameter>
-        <parameter name="stem optimal nutrient concentration">215</parameter>
-      </potassium>
-      <parameter name="relative potential transpiration">100</parameter>  <!-- cm3 g-1 -->
-      <parameter name="relative respiration rate leafs">0.04</parameter>  <!-- g g-1 day-1 -->
-      <parameter name="relative respiration rate stems">0.02</parameter>  <!-- g g-1 day-1 -->
-      <table name="specific leaf area" x_name="time" x_unit="day" y_unit="g cm-2">
-        0 0.0015  24 0.0025  40 0.003  60 0.003
-      </table>
-    </shoot>
+			<!-- ====== NUTRIENT UPTAKE KINETICS: NITRATE ====== -->
+			<SimulaDirective path="resources">
+				<SimulaBase name="nitrate">
+					<SimulaConstant name="initialNutrientUptake" unit="uMol">714</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="shoot">
+				<SimulaBase name="nitrate">
+					<SimulaConstant name="leafOptimalNutrientConcentration" unit="uMol/g">2600</SimulaConstant>
+					<SimulaConstant name="leafMinimalNutrientConcentration" unit="uMol/g">1300</SimulaConstant>
+					<SimulaConstant name="stemOptimalNutrientConcentration" unit="uMol/g">1300</SimulaConstant>
+					<SimulaConstant name="stemMinimalNutrientConcentration" unit="uMol/g">700</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotyl">
+				<SimulaBase name="nitrate">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="primaryRoot">
+				<SimulaBase name="nitrate">
+					<SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant>
+					<SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant>
+					<SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant>
+					<SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant>
+					<SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="basalWhorl1"><SimulaBase name="nitrate"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="basalWhorl2"><SimulaBase name="nitrate"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="basalWhorl3"><SimulaBase name="nitrate"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="hypocotylBornRoots"><SimulaBase name="nitrate"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="lateralBasalRoots"><SimulaBase name="nitrate"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="lateralHypocotylBornRoots"><SimulaBase name="nitrate"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRoot"><SimulaBase name="nitrate"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRootFastGrowing"><SimulaBase name="nitrate"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="finelateral"><SimulaBase name="nitrate"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="finelateralFastGrowing"><SimulaBase name="nitrate"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">1200</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">600</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">1.9</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.0161</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.001</SimulaConstant></SimulaBase></SimulaDirective>
 
-    <!-- ====================================================== -->
-    <!--  STRESS IMPACT FACTORS                                  -->
-    <!-- ====================================================== -->
-    <stressImpactFactors>
+			<!-- ====== NUTRIENT UPTAKE KINETICS: POTASSIUM ====== -->
+			<SimulaDirective path="resources">
+				<SimulaBase name="potassium">
+					<SimulaConstant name="initialNutrientUptake" unit="uMol">45</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="shoot">
+				<SimulaBase name="potassium">
+					<SimulaConstant name="leafOptimalNutrientConcentration" unit="uMol/g">430</SimulaConstant>
+					<SimulaConstant name="leafMinimalNutrientConcentration" unit="uMol/g">273</SimulaConstant>
+					<SimulaConstant name="stemOptimalNutrientConcentration" unit="uMol/g">215</SimulaConstant>
+					<SimulaConstant name="stemMinimalNutrientConcentration" unit="uMol/g">100</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
+			<SimulaDirective path="hypocotyl"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="primaryRoot"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="basalWhorl1"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="basalWhorl2"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="basalWhorl3"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="hypocotylBornRoots"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="lateralBasalRoots"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="lateralHypocotylBornRoots"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRoot"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="lateralPrimaryRootFastGrowing"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="finelateral"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
+			<SimulaDirective path="finelateralFastGrowing"><SimulaBase name="potassium"><SimulaConstant name="optimalNutrientConcentration" unit="uMol/g">234</SimulaConstant><SimulaConstant name="minimalNutrientConcentration" unit="uMol/g">168</SimulaConstant><SimulaConstant name="Imax" unit="uMol/cm2/day">0.467</SimulaConstant><SimulaConstant name="Km" unit="uMol/ml">0.039</SimulaConstant><SimulaConstant name="Efflux" unit="uMol/cm/day">1e-06</SimulaConstant><SimulaConstant name="Cmin" unit="uMol/ml">0.002</SimulaConstant></SimulaBase></SimulaDirective>
 
-      <!-- Impact on leaf area expansion rate -->
-      <impact on="leaf area expantion rate">
-        <table by="nitrate" x_name="nitrate stress factor" y_unit="">
-          0 0  0.3 0.1  1 1
-        </table>
-        <table by="phosphorus" x_name="phosphorus stress factor" y_unit="">
-          0 0  1 1
-        </table>
-        <table by="potassium" x_name="potassium stress factor" y_unit="">
-          0 1  1 1
-        </table>
-      </impact>
+			<!-- ====== STRESS IMPACT FACTORS ====== -->
+			<SimulaBase name="stressImpactFactors">
+				<SimulaBase name="impactOn:leafAreaExpantionRate">
+					<SimulaTable name_column2="impactBy:nitrate" name_column1="nitrate stress factor" garbageCollectionOff="true">0 0 0.3 0.1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:phosphorus" name_column1="phosphorus stress factor" garbageCollectionOff="true">0 0 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:potassium" name_column1="potassium stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+				</SimulaBase>
+				<SimulaBase name="impactOn:leafRespiration">
+					<SimulaTable name_column2="impactBy:nitrate" name_column1="nitrate stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:phosphorus" name_column1="phosphorus stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:potassium" name_column1="potassium stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+				</SimulaBase>
+				<SimulaBase name="impactOn:photosynthesis">
+					<SimulaTable name_column2="impactBy:nitrate" name_column1="nitrate stress factor" garbageCollectionOff="true">0 0 0.4 0.5 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:phosphorus" name_column1="phosphorus stress factor" garbageCollectionOff="true">0 0.5 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:potassium" name_column1="potassium stress factor" garbageCollectionOff="true">0 0 1 1</SimulaTable>
+				</SimulaBase>
+				<SimulaBase name="impactOn:rootPotentialLongitudinalGrowth">
+					<SimulaTable name_column2="impactBy:nitrate" name_column1="nitrate stress factor" garbageCollectionOff="true">0 0 0.5 1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:phosphorus" name_column1="phosphorus stress factor" garbageCollectionOff="true">0 1 0.1 1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:potassium" name_column1="potassium stress factor" garbageCollectionOff="true">0 0 0.5 1 1 1</SimulaTable>
+				</SimulaBase>
+				<SimulaBase name="impactOn:rootSegmentCarbonCostOfExudates">
+					<SimulaTable name_column2="impactBy:nitrate" name_column1="nitrate stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:phosphorus" name_column1="phosphorus stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:potassium" name_column1="potassium stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+				</SimulaBase>
+				<SimulaBase name="impactOn:rootSegmentRespiration">
+					<SimulaTable name_column2="impactBy:nitrate" name_column1="nitrate stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:phosphorus" name_column1="phosphorus stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:potassium" name_column1="potassium stress factor" garbageCollectionOff="true">0 0 1 1</SimulaTable>
+				</SimulaBase>
+				<SimulaBase name="impactOn:rootSegmentSecondaryGrowth">
+					<SimulaTable name_column2="impactBy:nitrate" name_column1="nitrate stress factor" garbageCollectionOff="true">0 0 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:phosphorus" name_column1="phosphorus stress factor" garbageCollectionOff="true">0 0 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:potassium" name_column1="potassium stress factor" garbageCollectionOff="true">0 0 1 1</SimulaTable>
+				</SimulaBase>
+				<SimulaBase name="impactOn:stemRespiration">
+					<SimulaTable name_column2="impactBy:nitrate" name_column1="nitrate stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:phosphorus" name_column1="phosphorus stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+					<SimulaTable name_column2="impactBy:potassium" name_column1="potassium stress factor" garbageCollectionOff="true">0 1 1 1</SimulaTable>
+				</SimulaBase>
+			</SimulaBase>
 
-      <!-- Impact on leaf respiration -->
-      <impact on="leaf respiration">
-        <table by="nitrate" x_name="nitrate stress factor">
-          0 1  1 1
-        </table>
-        <table by="phosphorus" x_name="phosphorus stress factor">
-          0 1  1 1
-        </table>
-        <table by="potassium" x_name="potassium stress factor">
-          0 1  1 1
-        </table>
-      </impact>
+			<!-- ====== AERENCHYMA SIMULATION CONTROLS ====== -->
+			<SimulaDirective path="/simulationControls">
+				<SimulaBase name="aerenchyma">
+					<SimulaConstant name="remobilizeP" type="bool">true</SimulaConstant>
+					<SimulaConstant name="reduceRespiration" type="bool">true</SimulaConstant>
+					<SimulaConstant name="includePhotosynthesisEffects" type="bool">true</SimulaConstant>
+				</SimulaBase>
+			</SimulaDirective>
 
-      <!-- Impact on photosynthesis -->
-      <impact on="photosynthesis">
-        <table by="nitrate" x_name="nitrate stress factor">
-          0 0  0.4 0.5  1 1
-        </table>
-        <table by="phosphorus" x_name="phosphorus stress factor">
-          0 0.5  1 1
-        </table>
-        <table by="potassium" x_name="potassium stress factor">
-          0 0  1 1
-        </table>
-      </impact>
-
-      <!-- Impact on root potential longitudinal growth -->
-      <impact on="root potential longitudinal growth">
-        <table by="nitrate" x_name="nitrate stress factor">
-          0 0  0.5 1  1 1
-        </table>
-        <table by="phosphorus" x_name="phosphorus stress factor">
-          0 1  0.1 1  1 1
-        </table>
-        <table by="potassium" x_name="potassium stress factor">
-          0 0  0.5 1  1 1
-        </table>
-      </impact>
-
-      <!-- Impact on root segment carbon cost of exudates -->
-      <impact on="root segment carbon cost of exudates">
-        <table by="nitrate" x_name="nitrate stress factor">
-          0 1  1 1
-        </table>
-        <table by="phosphorus" x_name="phosphorus stress factor">
-          0 1  1 1
-        </table>
-        <table by="potassium" x_name="potassium stress factor">
-          0 1  1 1
-        </table>
-      </impact>
-
-      <!-- Impact on root segment respiration -->
-      <impact on="root segment respiration">
-        <table by="nitrate" x_name="nitrate stress factor">
-          0 1  1 1
-        </table>
-        <table by="phosphorus" x_name="phosphorus stress factor">
-          0 1  1 1
-        </table>
-        <table by="potassium" x_name="potassium stress factor">
-          0 0  1 1
-        </table>
-      </impact>
-
-      <!-- Impact on root segment secondary growth -->
-      <impact on="root segment secondary growth">
-        <table by="nitrate" x_name="nitrate stress factor">
-          0 0  1 1
-        </table>
-        <table by="phosphorus" x_name="phosphorus stress factor">
-          0 0  1 1
-        </table>
-        <table by="potassium" x_name="potassium stress factor">
-          0 0  1 1
-        </table>
-      </impact>
-
-      <!-- Impact on stem respiration -->
-      <impact on="stem respiration">
-        <table by="nitrate" x_name="nitrate stress factor">
-          0 1  1 1
-        </table>
-        <table by="phosphorus" x_name="phosphorus stress factor">
-          0 1  1 1
-        </table>
-        <table by="potassium" x_name="potassium stress factor">
-          0 1  1 1
-        </table>
-      </impact>
-
-    </stressImpactFactors>
-
-  </rootTypeParameters>
-
-</SimRoot>
+		</SimulaBase>
+	</SimulaBase>
+</SimulationModel>
