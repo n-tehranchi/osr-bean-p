@@ -60,9 +60,21 @@ while IFS= read -r filename || [[ -n "${filename}" ]]; do
     # Skip blank lines
     [[ -z "${filename}" ]] && continue
 
-    # Strip .xml extension for job name
+    # Strip .xml extension and build a valid Run:ai job name
+    # (lowercase alphanumeric + hyphens only, <40 chars)
+    # e.g. bean_advanced_p1.00 -> bp-adv-p100
     basename="${filename%.xml}"
-    job_name="osr-bean-${basename}"
+    short_pheno="${basename#bean_}"          # advanced_p1.00
+    pheno="${short_pheno%%_*}"              # advanced
+    plevel="${short_pheno#*_p}"             # 1.00
+    plevel="${plevel//./}"                  # 100 (remove dots)
+    case "${pheno}" in
+        advanced)     ptag="adv" ;;
+        intermediate) ptag="int" ;;
+        reduced)      ptag="red" ;;
+        *)            ptag="${pheno:0:3}" ;;
+    esac
+    job_name="bp-${ptag}-p${plevel}"
 
     CMD=(
         runai training submit "${job_name}"
