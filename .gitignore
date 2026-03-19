@@ -1,0 +1,24 @@
+# Simulation outputs
+output/
+results/
+
+# Docker build artifacts
+*.tar
+*.tar.gz
+
+# Environment config (contains tokens)
+.env
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

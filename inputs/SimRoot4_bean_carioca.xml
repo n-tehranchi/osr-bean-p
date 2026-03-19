@@ -1,0 +1,1359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  OpenSimRoot input file: Common Bean (Phaseolus vulgaris cv. Carioca)
+  Parameterization source: Strock et al. (2018) Plant Physiology 176:691-703
+  Supplemental Data: "PP2017-RA-01583D_SimRoot_Parameterization"
+
+  Study: "Reduction in Root Secondary Growth as a Strategy for Phosphorus Acquisition"
+  Notes: This file represents the reference (wild-type / advanced secondary growth)
+         parameterization. To simulate the reduced-secondary-growth genotype, set
+         the 'multiplier' under 'secondary growth rate' to 0 for relevant root classes.
+
+  Root classes modeled:
+    - hypocotyl (ID 96)
+    - basal whorl1, whorl2, whorl3
+    - hypocotyl born roots (ID 98)
+    - lateral basal roots (ID 97)
+    - lateral hypocotyl born roots (ID 97)
+    - lateral primary root (ID 97)
+    - lateral primary root fast growing (ID 97)
+    - primary root (ID 100)
+    - finelateral (ID 97)
+    - finelateral fast growing (ID 97)
+-->
+
+<SimRoot>
+
+  <!-- ============================================================ -->
+  <!--  ENVIRONMENT                                                 -->
+  <!-- ============================================================ -->
+  <environment>
+
+    <atmosphere>
+      <parameter name="PAR/ RDD">1</parameter>
+      <!-- actual duration of sunshine: zero for the whole run (controlled glasshouse) -->
+      <table name="actual durationof sunshine" x_name="time" x_unit="day" y_unit="hour">
+        0 0
+        60 0
+      </table>
+      <parameter name="albedo crop">0.23</parameter>
+      <parameter name="albedo soil">0.17</parameter>
+      <parameter name="altitude">91</parameter>  <!-- m -->
+      <table name="average daily temperature" x_name="time" x_unit="day" y_unit="degreesC">
+        0  16.9
+        100 16.9
+      </table>
+      <!-- evaporation: daily measured values (cm) -->
+      <table name="evaporation" x_name="time" x_unit="day" y_unit="cm">
+        0 0   1 0.05  2 0.1   3 0.1   4 0.05  5 0.05  6 0.1   7 0.05
+        8 0.05  9 0.1  10 0.1  11 0.05  12 0.1  13 0.1  14 0.05  15 0.04
+        16 0.03  17 0.02  18 0.09  19 0.09  20 0.04  21 0.09  22 0.09  23 0.04
+        24 0.03  25 0.02  26 0.02  27 0.08  28 0.03  29 0.08  30 0.03  31 0.08
+        32 0.07  33 0.07  34 0.07  35 0.03  36 0.02  37 0.01  38 0  39 0
+        40 0  41 0  42 0.06
+      </table>
+      <parameter name="irradiation">4000</parameter>  <!-- umol cm-2 day-1 -->
+      <parameter name="latitude">50.8</parameter>
+      <parameter name="net radiation">50</parameter>    <!-- W m-2 -->
+      <parameter name="net radiation soil">0</parameter>  <!-- W m-2 -->
+      <!-- precipitation: daily measured values (cm day-1) -->
+      <table name="precipitation" x_name="time" x_unit="day" y_unit="cm day-1">
+        0 0   1 0   2 1   3 0.29  4 0   5 0   6 0.61  7 0
+        8 0   9 0.25  10 0.03  11 0   12 0.64  13 0.33  14 0   15 0
+        16 0  17 0  18 1.8  19 0.2  20 0  21 2.84  22 0.38  23 0
+        24 0  25 0  26 0  27 0.18  28 0  29 0.46  30 0  31 1.35
+        32 0.13  33 0.23  34 0.25  35 0  36 0  37 0  38 0  39 0
+        40 0  41 0  42 1.42
+      </table>
+      <parameter name="relative humidity">60</parameter>   <!-- % -->
+      <parameter name="start day">22</parameter>
+      <parameter name="start month">6</parameter>
+      <parameter name="wind speed">2</parameter>  <!-- m s-1 -->
+    </atmosphere>
+
+    <dimensions>
+      <parameter name="max corner">11 0 15</parameter>   <!-- cm -->
+      <parameter name="min corner">-11 -150 -15</parameter>   <!-- cm -->
+      <parameter name="resolution">1 1 1</parameter>   <!-- cm -->
+    </dimensions>
+
+    <!-- ========== SOIL ========== -->
+    <soil>
+
+      <!-- Bulk density profile -->
+      <table name="bulk density" x_name="depth" x_unit="cm" y_unit="g cm-3">
+        -200 1.51
+        -65  1.51
+        -47  1.4
+        -30  1.42
+        -16  1.29
+        -5   1.24
+        0    1.24
+      </table>
+
+      <!-- NITRATE -->
+      <nitrate>
+        <parameter name="adsorption coefficient">0</parameter>  <!-- umol cm-1 -->
+        <table name="buffer power" x_name="depth" x_unit="cm">
+          -1000 0.4
+          1000  0.4
+        </table>
+        <table name="concentration" x_name="depth" x_unit="cm" y_unit="umol ml-1">
+          -1000 1.59  -55 1.59  -45 1.67  -35 2.17  -25 3.15
+          -15   4.02  -5  2.36   0  2.8  0.01 0  100 0
+        </table>
+        <table name="diffusion coefficient" x_name="depth" x_unit="cm" y_unit="cm2 day-1">
+          -1000 0.07  0 0.07  1e-05 1e-08  1000 1e-08
+        </table>
+        <parameter name="increase time step">1</parameter>
+        <parameter name="longitudinal dispersivity">1</parameter>  <!-- cm -->
+        <parameter name="r1-r0">4</parameter>  <!-- cm -->
+        <parameter name="saturated diffusion coefficient">1.6416</parameter>  <!-- cm2 day-1 -->
+        <parameter name="transverse dispersivity">0.5</parameter>  <!-- cm -->
+      </nitrate>
+
+      <!-- ORGANIC MATTER -->
+      <organic>
+        <parameter name="CNRatio microbes">10</parameter>  <!-- g g-1 -->
+        <table name="CNratio" x_name="depth" x_unit="cm" y_unit="g g-1">
+          -10000 13  0 13
+        </table>
+        <parameter name="assimilation efficiency microbes">1</parameter>
+        <table name="carbon content" x_name="depth" x_unit="cm" y_unit="g g-1">
+          -200 0.005  -40 0.005  -30 0.01  -10 0.02  0 0.02
+        </table>
+        <table name="initial relative mineralisation rate" x_name="depth" x_unit="cm" y_unit="g g-1 year-1">
+          -1000 0  -25 0  -10 0.037  0 0.037
+        </table>
+        <parameter name="speed of aging">0.46</parameter>
+        <parameter name="time offset">30</parameter>  <!-- day -->
+      </organic>
+
+      <!-- PHOSPHORUS -->
+      <phosphorus>
+        <parameter name="adsorption coefficient">1333.3</parameter>  <!-- umol cm-1 -->
+        <table name="buffer power" x_name="depth" x_unit="cm">
+          -1000 400  1000 400
+        </table>
+        <table name="concentration" x_name="depth" x_unit="cm" y_unit="umol ml-1">
+          -1000 0.001  -30 0.001  -29 0.001  -10 0.001
+          -9    0.001   -5 0.001   -4 0.001    0 0.001
+          0.0001 0  1000 0
+        </table>
+        <table name="diffusion coefficient" x_name="depth" x_unit="cm" y_unit="cm2 day-1">
+          -1000 0.00019872  1000 0.00019872
+        </table>
+        <parameter name="increase time step">1.1</parameter>
+        <parameter name="longitudinal dispersivity">0</parameter>  <!-- cm -->
+        <parameter name="r1-r0">0.3</parameter>  <!-- cm -->
+        <parameter name="saturated diffusion coefficient">0.00495</parameter>  <!-- cm2 day-1 -->
+        <parameter name="transverse dispersivity">0</parameter>  <!-- cm -->
+      </phosphorus>
+
+      <!-- POTASSIUM -->
+      <potassium>
+        <parameter name="adsorption coefficient">33.3</parameter>  <!-- umol cm-1 -->
+        <table name="buffer power" x_name="depth" x_unit="cm">
+          -1000 10  1000 10
+        </table>
+        <table name="concentration" x_name="depth" x_unit="cm" y_unit="umol ml-1">
+          -1000 0.05  -30 0.05  -29 0.15  0 0.15  1e-05 0  1000 0
+        </table>
+        <table name="diffusion coefficient" x_name="depth" x_unit="cm" y_unit="cm2 day-1">
+          -1000 0.067  1000 0.067
+        </table>
+        <parameter name="increase time step">1.01</parameter>
+        <parameter name="longitudinal dispersivity">1</parameter>  <!-- cm -->
+        <parameter name="r1-r0">1.5</parameter>  <!-- cm -->
+        <parameter name="saturated diffusion coefficient">1.56</parameter>  <!-- cm2 day-1 -->
+        <parameter name="transverse dispersivity">0.5</parameter>  <!-- cm -->
+      </potassium>
+
+      <!-- WATER -->
+      <water>
+        <table name="initial hydraulic head" x_name="depth" x_unit="cm" y_unit="cm">
+          -200 0    -151 -50   -50 -150  -45 -155  -40 -160
+          -35 -165  -30 -170  -25 -175  -20 -180  -15 -190
+          -10 -200   -5 -220   -2 -240   -1 -300    0 -400
+        </table>
+        <table name="residual water content" x_name="depth" x_unit="cm" y_unit="100%">
+          -300 0.067  0 0.067
+        </table>
+        <table name="saturated conductivity" x_name="depth" x_unit="cm" y_unit="cm day-1">
+          -300 10.8  0 10.8
+        </table>
+        <table name="saturated water content" x_name="depth" x_unit="cm" y_unit="100%">
+          -300 0.39  -65 0.39  -35 0.39  -25 0.43  -15 0.45  0 0.46
+        </table>
+        <table name="van genuchten:alpha" x_name="depth" x_unit="cm" y_unit="1cm-1">
+          -300 0.02  0 0.02
+        </table>
+        <table name="van genuchten:n" x_name="depth" x_unit="cm">
+          -300 1.41  0 1.41
+        </table>
+        <parameter name="volumetric water content in barber cushman">0.3</parameter>  <!-- cm3 cm-3 -->
+      </water>
+
+    </soil>
+
+  </environment>
+
+  <!-- ============================================================ -->
+  <!--  ROOT TYPE PARAMETERS  (Bean - carioca - SimRoot4)           -->
+  <!-- ============================================================ -->
+  <rootTypeParameters name="Bean- carioca- sim root4">
+
+    <!-- ====== SHARED NUTRIENT UPTAKE KINETICS (used across all root classes) ====== -->
+    <!-- Defined once here as XML entities / comments for clarity;
+         they are repeated inline per root class below as required by OSR format. -->
+    <!--
+      Nitrate:  Cmin=0.001, Imax=1.9, Km=0.0161, min_conc=600, opt_conc=1200  (umol/ml, umol/cm2/d, etc.)
+      Phosphorus: Cmin=0.0002, Efflux=1e-06, Imax=0.0555, Km=0.00545, min=30, opt=60
+      Potassium: Cmin=0.002, Efflux=1e-06, Imax=0.467, Km=0.039, min=168, opt=234
+    -->
+
+    <!-- ====================================================== -->
+    <!--  HYPOCOTYL  (root class ID 96)                         -->
+    <!-- ====================================================== -->
+    <rootType name="hypocotyl">
+      <parameter name="root class ID">96</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  100 0
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">0</parameter>
+      <parameter name="density">0.094</parameter>  <!-- g cm-3 -->
+      <parameter name="diameter">0.4</parameter>  <!-- cm -->
+      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="0.5" max="0.6"/>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 1  1 3  2 3  3 1  3.3 0.5  4 0.2  5 0  1000 0
+      </table>
+      <!-- Nitrate uptake kinetics -->
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <!-- Phosphorus uptake kinetics -->
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <!-- Potassium uptake kinetics -->
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 0  100 0
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <parameter name="root hair density_base">0</parameter>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 0  100 0
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>  <!-- cm -->
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <!-- Secondary growth -->
+      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
+        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
+        18 0.0026  24 0.00285  29 0.003  100 0.003
+      </table>
+      <parameter name="secondary growth rate multiplier">1</parameter>
+      <!-- Secondary growth scaling: high near base for hypocotyl -->
+      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
+        0 7  2 7  10 7  1000 7
+      </table>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.01" max="0.01"/>
+      <!-- Branch list -->
+      <branchList>
+        <branch name="basal whorl1">
+          <parameter name="branching frequency">0.01</parameter>
+          <parameter name="branching spatial offset">0.01</parameter>
+          <parameter name="branching time offset">4.167</parameter>  <!-- day -->
+          <parameter name="max number of branches">4</parameter>
+          <parameter name="number of branches/whorl">4</parameter>
+        </branch>
+        <branch name="basal whorl2">
+          <parameter name="branching frequency">0.5</parameter>
+          <parameter name="branching spatial offset">0.3</parameter>
+          <parameter name="branching time offset">6.25</parameter>  <!-- day -->
+          <parameter name="max number of branches">4</parameter>
+          <parameter name="number of branches/whorl">4</parameter>
+        </branch>
+        <branch name="hypocotyl born roots">
+          <parameter name="allow branches to form above ground">0</parameter>
+          <parameter name="branching delay">0</parameter>
+          <parameter name="branching frequency">0.4</parameter>
+          <parameter name="branching spatial offset">0.4</parameter>
+          <parameter name="branching time offset">10</parameter>
+          <parameter name="max number of branches">10</parameter>
+        </branch>
+      </branchList>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  BASAL WHORL 1                                         -->
+    <!-- ====================================================== -->
+    <rootType name="basal whorl1">
+      <parameter name="root class ID">99</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">90</parameter>  <!-- degrees -->
+      <parameter name="density">0.094</parameter>  <!-- g cm-3 -->
+      <parameter name="diameter">0.068</parameter>  <!-- cm -->
+      <parameter name="gravitropism">0.002</parameter>
+      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="-0.08" max="-0.04"/>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 0.1  3 4  10 4  15 3  25 2.352  35 2.352  40 0  1000 0
+      </table>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <parameter name="regular topology">0</parameter>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 2000  10 2000  30 2000  100 2000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
+        0 0  2 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
+        18 0.0026  24 0.00285  29 0.003  100 0.003
+      </table>
+      <parameter name="secondary growth rate multiplier">1</parameter>
+      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
+        0 0.7  20 0.7  40 0.4  100 0.4
+      </table>
+      <parameter name="soil impedence">0.008</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.04" max="0.04"/>
+      <branchList>
+        <branch name="lateral basal roots">
+          <parameter name="allow branches to form above ground">0</parameter>
+          <parameter name="branching frequency">0.15</parameter>
+          <parameter name="length root tip">8</parameter>
+        </branch>
+      </branchList>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  BASAL WHORL 2                                         -->
+    <!-- ====================================================== -->
+    <rootType name="basal whorl2">
+      <parameter name="root class ID">99</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">90</parameter>
+      <parameter name="density">0.094</parameter>
+      <parameter name="diameter">0.068</parameter>
+      <parameter name="gravitropism">0.001</parameter>
+      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="-0.04" max="-0.02"/>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 0.1  3 4  10 4  15 3  25 2.352  35 2.352  40 0  1000 0
+      </table>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <parameter name="regular topology">0</parameter>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 2000  10 2000  30 2000  100 2000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
+        0 0  2 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
+        18 0.0026  24 0.00285  29 0.003  100 0.003
+      </table>
+      <parameter name="secondary growth rate multiplier">1</parameter>
+      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
+        0 0.7  20 0.7  40 0.4  100 0.4
+      </table>
+      <parameter name="soil impedence">0.008</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.04" max="0.04"/>
+      <branchList>
+        <branch name="lateral basal roots">
+          <parameter name="allow branches to form above ground">0</parameter>
+          <parameter name="branching frequency">0.15</parameter>
+          <parameter name="length root tip">10</parameter>
+        </branch>
+      </branchList>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  BASAL WHORL 3                                         -->
+    <!-- ====================================================== -->
+    <rootType name="basal whorl3">
+      <parameter name="root class ID">99</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">90</parameter>
+      <parameter name="density">0.094</parameter>
+      <parameter name="diameter">0.068</parameter>
+      <parameter name="gravitropism">0.0005</parameter>
+      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="-0.02" max="-0.01"/>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 0.1  2 4  10 4  15 3  25 2.352  35 2.352  40 0  1000 0
+      </table>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <parameter name="regular topology">0</parameter>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 2000  10 2000  30 2000  100 2000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
+        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
+        18 0.0026  24 0.00285  29 0.003  100 0.003
+      </table>
+      <parameter name="secondary growth rate multiplier">1</parameter>
+      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
+        0 0.7  20 0.7  40 0.4  100 0.4
+      </table>
+      <parameter name="soil impedence">0.008</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.04" max="0.04"/>
+      <branchList>
+        <branch name="lateral basal roots">
+          <parameter name="allow branches to form above ground">0</parameter>
+          <parameter name="branching frequency">0.15</parameter>
+          <parameter name="length root tip">10</parameter>
+        </branch>
+      </branchList>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  HYPOCOTYL BORN ROOTS  (ID 98)                         -->
+    <!-- ====================================================== -->
+    <rootType name="hypocotyl born roots">
+      <parameter name="root class ID">98</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">85</parameter>
+      <parameter name="density">0.094</parameter>
+      <parameter name="diameter">0.064</parameter>
+      <parameter name="gravitropism">0</parameter>
+      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="-0.002" max="0"/>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 1  25 0.8  35 0  60 0
+      </table>
+      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.5" max="1.5" mean="1" stdev="0.1"/>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <parameter name="regular topology">0</parameter>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 3000  10 3000  30 3000  100 3000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
+        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
+        18 0.0026  24 0.00285  29 0.003  100 0.003
+      </table>
+      <parameter name="secondary growth rate multiplier">1</parameter>
+      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
+        0 0.6  50 0.2  100 0.2
+      </table>
+      <parameter name="soil impedence">0.003</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.04" max="0.04"/>
+      <branchList>
+        <branch name="lateral hypocotyl born roots">
+          <parameter name="allow branches to form above ground">0</parameter>
+          <parameter name="branching frequency">0.4</parameter>
+          <parameter name="length root tip">10</parameter>
+        </branch>
+      </branchList>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  LATERAL BASAL ROOTS  (ID 97)                          -->
+    <!-- ====================================================== -->
+    <rootType name="lateral basal roots">
+      <parameter name="root class ID">97</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">75</parameter>
+      <parameter name="density">0.094</parameter>
+      <parameter name="diameter">0.03</parameter>
+      <parameter name="gravitropism">0</parameter>
+      <parameter name="gravitropism.v2">0 0 0</parameter>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 0.768  2 0.768  4 0.768  6 0.2  10 0  1000 0
+      </table>
+      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.6" max="1.0" mean="0.8" stdev="0.1"/>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <parameter name="regular topology">0</parameter>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 3000  100 3000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <parameter name="soil impedence">0.02</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.1" max="0.1"/>
+      <parameter name="topology offset">0</parameter>
+      <branchList>
+        <branch name="finelateral">
+          <parameter name="allow branches to form above ground">0</parameter>
+          <parameter name="branching frequency">0.5</parameter>
+          <parameter name="length root tip">4</parameter>
+        </branch>
+      </branchList>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  LATERAL HYPOCOTYL BORN ROOTS  (ID 97)                 -->
+    <!-- ====================================================== -->
+    <rootType name="lateral hypocotyl born roots">
+      <parameter name="root class ID">97</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">75</parameter>
+      <parameter name="density">0.094</parameter>
+      <parameter name="diameter">0.03</parameter>
+      <parameter name="gravitropism">0</parameter>
+      <parameter name="gravitropism.v2">0 0 0</parameter>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 0.768  2 0.768  4 0.768  6 0.2  10 0  1000 0
+      </table>
+      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.6" max="1.0" mean="0.8" stdev="0.1"/>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <parameter name="regular topology">0</parameter>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 3000  100 3000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <parameter name="soil impedence">0.015</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.1" max="0.1"/>
+      <parameter name="topology offset">0</parameter>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  PRIMARY ROOT  (ID 100)                                -->
+    <!-- ====================================================== -->
+    <rootType name="primary root">
+      <parameter name="root class ID">100</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">0</parameter>
+      <parameter name="density">0.094</parameter>
+      <parameter name="diameter">0.09</parameter>
+      <parameter name="gravitropism">0.011</parameter>
+      <distribution name="gravitropism.v2" type="uniform" unit="cm" min="-0.015" max="-0.005"/>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 2.357  10 2.357  15 2.357  250 2.357
+      </table>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">16</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 2000  10 2000  30 2000  100 2000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
+        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
+        18 0.0026  24 0.00285  29 0.003  100 0.003
+      </table>
+      <parameter name="secondary growth rate multiplier">1</parameter>
+      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
+        0 4  0.5 4  1 4  20 4  40 2  100 2
+      </table>
+      <parameter name="soil impedence">0.01</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.05" max="0.05"/>
+      <branchList>
+        <branch name="lateral primary root">
+          <parameter name="allow branches to form above ground">0</parameter>
+          <parameter name="branching frequency">0.1</parameter>
+          <parameter name="length root tip">10</parameter>
+          <parameter name="number of branches/whorl">1</parameter>
+        </branch>
+        <branch name="lateral primary root fast growing">
+          <parameter name="allow branches to form above ground">0</parameter>
+          <distribution name="branching frequency" type="uniform" unit="cm" min="1" max="5"/>
+          <parameter name="length root tip">10</parameter>
+          <parameter name="number of branches/whorl">1</parameter>
+        </branch>
+      </branchList>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  LATERAL PRIMARY ROOT  (ID 97)                         -->
+    <!-- ====================================================== -->
+    <rootType name="lateral primary root">
+      <parameter name="root class ID">97</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">75</parameter>
+      <parameter name="density">0.094</parameter>
+      <parameter name="diameter">0.03</parameter>
+      <parameter name="gravitropism">0</parameter>
+      <parameter name="gravitropism.v2">0 0 0</parameter>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 0.768  2 0.768  4 0.768  6 0.768  10 0  1000 0
+      </table>
+      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.8" max="1.2" mean="1.0" stdev="0.1"/>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <parameter name="regular topology">0</parameter>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 2000  10 2000  30 2000  100 2000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
+        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
+        18 0.0026  24 0.00285  29 0.003  100 0.003
+      </table>
+      <parameter name="secondary growth rate multiplier">1</parameter>
+      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
+        0 0.1  50 0.1  100 0.1
+      </table>
+      <parameter name="soil impedence">0.02</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.2" max="0.2"/>
+      <parameter name="topology offset">0</parameter>
+      <branchList>
+        <branch name="finelateral">
+          <parameter name="allow branches to form above ground">0</parameter>
+          <parameter name="branching frequency">0.5</parameter>
+          <parameter name="length root tip">4</parameter>
+        </branch>
+      </branchList>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  LATERAL PRIMARY ROOT FAST GROWING  (ID 97)            -->
+    <!-- ====================================================== -->
+    <rootType name="lateral primary root fast growing">
+      <parameter name="root class ID">97</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">75</parameter>
+      <parameter name="density">0.094</parameter>
+      <parameter name="diameter">0.03</parameter>
+      <parameter name="gravitropism">0</parameter>
+      <parameter name="gravitropism.v2">0 0 0</parameter>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 0.768  2 0.768  15 0.768  20 0  1000 0
+      </table>
+      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="1.4" max="1.8" mean="1.6" stdev="0.2"/>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <parameter name="regular topology">0</parameter>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 3000  100 3000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <table name="secondary growth rate" x_name="root segment age" x_unit="day" y_unit="cm day-1">
+        0 0  4 0.0005  5 0.001  7 0.0015  11 0.002  13 0.0023
+        18 0.0026  24 0.00285  29 0.003  100 0.003
+      </table>
+      <parameter name="secondary growth rate multiplier">1</parameter>
+      <table name="secondary growth scaling factor" x_name="distance to base of the root" x_unit="cm" y_unit="100%">
+        0 0.3  50 0.2  100 0.2
+      </table>
+      <parameter name="soil impedence">0.02</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.1" max="0.1"/>
+      <parameter name="topology offset">0</parameter>
+      <branchList>
+        <branch name="finelateral fast growing">
+          <parameter name="allow branches to form above ground">0</parameter>
+          <parameter name="branching frequency">0.55</parameter>
+          <parameter name="length root tip">4</parameter>
+        </branch>
+      </branchList>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  FINELATERAL  (ID 97)                                  -->
+    <!-- ====================================================== -->
+    <rootType name="finelateral">
+      <parameter name="root class ID">97</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">75</parameter>
+      <parameter name="density">0.094</parameter>
+      <parameter name="diameter">0.01</parameter>
+      <parameter name="gravitropism">0</parameter>
+      <parameter name="gravitropism.v2">0 0 0</parameter>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 0.2  3 0.2  5 0  100 0
+      </table>
+      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.3" max="1.0" mean="0.6" stdev="0.1"/>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <parameter name="regular topology">0</parameter>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 3000  100 3000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <parameter name="soil impedence">0.5</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.1" max="0.1"/>
+      <parameter name="topology offset">0</parameter>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  FINELATERAL FAST GROWING  (ID 97)                     -->
+    <!-- ====================================================== -->
+    <rootType name="finelateral fast growing">
+      <parameter name="root class ID">97</parameter>
+      <table name="aerenchyma formation" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0  3 0  5 0.05  10 0.1  20 0.268  1000 0.268
+      </table>
+      <parameter name="bottom boundary">1</parameter>
+      <parameter name="bounce of the side">1</parameter>
+      <parameter name="top boundary">1</parameter>
+      <parameter name="branching angle">75</parameter>
+      <parameter name="density">0.094</parameter>
+      <parameter name="diameter">0.015</parameter>
+      <parameter name="gravitropism">0</parameter>
+      <parameter name="gravitropism.v2">0 0 0</parameter>
+      <table name="growth rate" x_name="time since creation" x_unit="day" y_unit="cm day-1">
+        0 0.5  1 0.8  2 1  3 1  4 0  100 0
+      </table>
+      <distribution name="longitudinal growth rate multiplier" type="normal" unit="cm" min="0.3" max="1.0" mean="0.6" stdev="0.1"/>
+      <nitrate>
+        <parameter name="Cmin">0.001</parameter>
+        <parameter name="Imax">1.9</parameter>
+        <parameter name="Km">0.0161</parameter>
+        <parameter name="minimal nutrient concentration">600</parameter>
+        <parameter name="optimal nutrient concentration">1200</parameter>
+      </nitrate>
+      <parameter name="number of xylem poles">4</parameter>
+      <phosphorus>
+        <parameter name="Cmin">0.0002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.0555</parameter>
+        <parameter name="Km">0.00545</parameter>
+        <parameter name="minimal nutrient concentration">30</parameter>
+        <parameter name="optimal nutrient concentration">60</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="Cmin">0.002</parameter>
+        <parameter name="Efflux">1e-06</parameter>
+        <parameter name="Imax">0.467</parameter>
+        <parameter name="Km">0.039</parameter>
+        <parameter name="minimal nutrient concentration">168</parameter>
+        <parameter name="optimal nutrient concentration">234</parameter>
+      </potassium>
+      <table name="reduction in respiration due to aerenchyma" x_name="aerenchymaFormation" x_unit="100%" y_unit="100%">
+        0 0  0.3 0.7  0.6 1
+      </table>
+      <parameter name="regular topology">0</parameter>
+      <table name="relative carbon cost of exudation" x_name="time since creation" x_unit="day" y_unit="g cm-1 day-1">
+        0 1.915e-05  1.8 1.511e-05  3.1 1.699e-05  4.4 1.362e-05  100 1.362e-05
+      </table>
+      <table name="relative respiration" x_name="time since creation" x_unit="day" y_unit="g g-1 day-1">
+        0 0.09  2 0.04  6 0.04  1000 0.04
+      </table>
+      <table name="root hair density" x_name="time since creation" x_unit="day" y_unit="# cm-2">
+        0 3000  100 3000
+      </table>
+      <parameter name="root hair diameter">0.0005</parameter>
+      <table name="root hair length" x_name="time since creation" x_unit="day" y_unit="cm">
+        0 0  1 0  2 0.03  100 0.03
+      </table>
+      <parameter name="soil impedence">0.5</parameter>
+      <distribution name="soil impedence.v2" type="uniform" unit="cm" min="-0.1" max="0.1"/>
+      <parameter name="topology offset">0</parameter>
+    </rootType>
+
+    <!-- ====================================================== -->
+    <!--  RESOURCES (carbon, shoot, whole-plant)                -->
+    <!-- ====================================================== -->
+    <resources>
+      <parameter name="Cto dry weight ratio">0.45</parameter>  <!-- 100% -->
+      <table name="carbon allocation to leafs factor" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 0.7  10 0.65  30 0.65  40 0.65  60 0.4
+      </table>
+      <table name="carbon allocation to roots factor" x_name="time since creation" x_unit="day" y_unit="100%">
+        0 1  1 0.5  5 0.2  1000 0.2
+      </table>
+      <parameter name="carbon cost of biological nitrogen fixation">3.95e-05</parameter>  <!-- g umol-1 -->
+      <parameter name="carbon cost of nitrate uptake">1.392e-05</parameter>  <!-- g umol-1 -->
+      <parameter name="max carbon allocation to secondary growth">0.7</parameter>  <!-- 100% -->
+      <parameter name="max carbon allocation to shoot">0.85</parameter>  <!-- 100% -->
+      <nitrate>
+        <parameter name="initial nutrient uptake">714</parameter>  <!-- umol -->
+      </nitrate>
+      <phosphorus>
+        <parameter name="initial nutrient uptake">39</parameter>  <!-- umol -->
+      </phosphorus>
+      <potassium>
+        <parameter name="initial nutrient uptake">45</parameter>  <!-- umol -->
+      </potassium>
+      <parameter name="relative reliance on BNF">0.3</parameter>  <!-- 100% -->
+      <table name="reserve allocation rate" x_name="time since creation" x_unit="day" y_unit="100% day-1">
+        0 0.4  2 0.4  3 0.4  4 0.4  1000 0.4
+      </table>
+      <parameter name="seed size">0.2</parameter>  <!-- g -->
+    </resources>
+
+    <!-- ====================================================== -->
+    <!--  SHOOT                                                  -->
+    <!-- ====================================================== -->
+    <shoot>
+      <parameter name="aerenchyma photosynthesis mitigation">0.5</parameter>
+      <parameter name="area per plant">660</parameter>  <!-- cm2 -->
+      <parameter name="extinction coefficient">0.9</parameter>
+      <!-- Leaf area expansion rate: large table from supplemental data -->
+      <table name="leaf area expantion rate" x_name="time" x_unit="day" y_unit="cm2 day-1">
+        0 0   2 0   3 3   4 5   6 5   7.04 3.91   7.29 4.21   7.55 4.52
+        7.8 4.85   8.05 5.19   8.3 5.54   8.56 5.92   8.81 6.31   9.06 6.72
+        9.31 7.14   9.57 7.59   9.82 8.06   10.07 8.55   10.32 9.06   10.58 9.59
+        10.83 10.15   11.08 10.74   11.33 11.35   11.59 11.99   11.84 12.66   12.09 13.36
+        12.34 14.09   12.6 14.85   12.85 15.65   13.1 16.49   13.35 17.37   13.61 18.28
+        13.86 19.24   14.11 20.24   14.36 21.29   14.62 22.39   14.87 23.53   15.12 24.73
+        15.37 25.98   15.63 27.3   15.88 28.67   16.13 30.1   16.38 31.6   16.64 33.17
+        16.89 34.81   17.14 36.53   17.39 38.32   17.65 40.2   17.9 42.16   18.15 44.21
+        18.4 46.36   18.66 48.61   18.91 50.96   19.16 53.41   19.41 55.98   19.67 58.67
+        19.92 61.48   20.17 64.42   20.42 67.49   20.68 70.71   20.93 74.07   21.18 77.59
+        21.43 81.27   21.69 85.12   21.94 89.14   22.19 93.35   22.44 97.75   22.7 102.35
+        22.95 107.17   23.2 112.2   23.45 117.47   23.71 122.98   23.96 128.74   24.21 134.76
+        24.46 141.06   24.72 147.65   24.97 154.55   25.29 156.06   25.66 154.09   26.02 152.11
+        26.38 150.11   26.74 148.1   27.1 146.08   27.46 144.05   27.83 142.02   28.19 139.98
+        28.55 137.94   28.91 135.9   29.27 133.85   29.63 131.81   29.99 129.77   30.36 127.73
+        30.72 125.7   31.08 123.67   31.44 121.65   31.8 119.64   32.16 117.64   32.52 115.65
+        32.89 113.67   33.25 111.71   33.61 109.75   33.97 107.81   34.33 105.89   34.69 103.98
+        35.06 102.09   35.42 100.21   35.78 98.36   36.14 96.52   36.5 94.7   36.86 92.9
+        37.22 91.12   37.59 89.36   37.95 87.62   38.31 85.9   38.67 84.2   39.03 82.53
+        39.39 80.87   39.76 79.24   40.12 77.63   40.48 76.05   40.84 74.49   41.2 72.95
+        41.56 71.43   41.92 69.94   42.29 68.47   42.65 67.02   43.01 65.59   43.37 64.19
+        43.73 62.82   44.09 61.46   44.45 60.13   44.82 58.82   45.18 57.53   45.54 56.27
+        45.9 55.03   46.26 53.81   46.62 52.61   46.99 51.44   47.35 50.29   47.71 49.16
+        48.07 48.05   48.43 46.96   48.79 45.89   49.15 44.84   49.52 43.82   49.88 42.81
+        50.24 41.83   50.6 40.86   50.96 39.91   51.32 38.99   51.69 38.08   52.05 37.19
+        52.41 36.32   52.77 35.47   53.13 34.63   53.49 33.82   53.85 33.02   54.22 32.23
+        54.58 31.47   54.94 30.72   55.3 29.99   55.66 29.27   56.02 28.57   56.38 27.88
+        56.75 27.21   57.11 26.56   57.47 25.92   57.83 25.29   58.19 24.68   58.55 24.08
+        58.92 23.49   59.28 22.92   59.64 22.36
+      </table>
+      <parameter name="light use efficiency">3.8e-07</parameter>  <!-- g umol-1 -->
+      <nitrate>
+        <parameter name="leaf minimal nutrient concentration">1300</parameter>   <!-- umol g-1 -->
+        <parameter name="leaf optimal nutrient concentration">2600</parameter>
+        <parameter name="stem minimal nutrient concentration">700</parameter>
+        <parameter name="stem optimal nutrient concentration">1300</parameter>
+      </nitrate>
+      <phosphorus>
+        <parameter name="leaf minimal nutrient concentration">50</parameter>   <!-- umol g-1 -->
+        <parameter name="leaf optimal nutrient concentration">100</parameter>
+        <parameter name="stem minimal nutrient concentration">25</parameter>
+        <parameter name="stem optimal nutrient concentration">50</parameter>
+      </phosphorus>
+      <potassium>
+        <parameter name="leaf minimal nutrient concentration">273</parameter>   <!-- umol g-1 -->
+        <parameter name="leaf optimal nutrient concentration">430</parameter>
+        <parameter name="stem minimal nutrient concentration">100</parameter>
+        <parameter name="stem optimal nutrient concentration">215</parameter>
+      </potassium>
+      <parameter name="relative potential transpiration">100</parameter>  <!-- cm3 g-1 -->
+      <parameter name="relative respiration rate leafs">0.04</parameter>  <!-- g g-1 day-1 -->
+      <parameter name="relative respiration rate stems">0.02</parameter>  <!-- g g-1 day-1 -->
+      <table name="specific leaf area" x_name="time" x_unit="day" y_unit="g cm-2">
+        0 0.0015  24 0.0025  40 0.003  60 0.003
+      </table>
+    </shoot>
+
+    <!-- ====================================================== -->
+    <!--  STRESS IMPACT FACTORS                                  -->
+    <!-- ====================================================== -->
+    <stressImpactFactors>
+
+      <!-- Impact on leaf area expansion rate -->
+      <impact on="leaf area expantion rate">
+        <table by="nitrate" x_name="nitrate stress factor" y_unit="">
+          0 0  0.3 0.1  1 1
+        </table>
+        <table by="phosphorus" x_name="phosphorus stress factor" y_unit="">
+          0 0  1 1
+        </table>
+        <table by="potassium" x_name="potassium stress factor" y_unit="">
+          0 1  1 1
+        </table>
+      </impact>
+
+      <!-- Impact on leaf respiration -->
+      <impact on="leaf respiration">
+        <table by="nitrate" x_name="nitrate stress factor">
+          0 1  1 1
+        </table>
+        <table by="phosphorus" x_name="phosphorus stress factor">
+          0 1  1 1
+        </table>
+        <table by="potassium" x_name="potassium stress factor">
+          0 1  1 1
+        </table>
+      </impact>
+
+      <!-- Impact on photosynthesis -->
+      <impact on="photosynthesis">
+        <table by="nitrate" x_name="nitrate stress factor">
+          0 0  0.4 0.5  1 1
+        </table>
+        <table by="phosphorus" x_name="phosphorus stress factor">
+          0 0.5  1 1
+        </table>
+        <table by="potassium" x_name="potassium stress factor">
+          0 0  1 1
+        </table>
+      </impact>
+
+      <!-- Impact on root potential longitudinal growth -->
+      <impact on="root potential longitudinal growth">
+        <table by="nitrate" x_name="nitrate stress factor">
+          0 0  0.5 1  1 1
+        </table>
+        <table by="phosphorus" x_name="phosphorus stress factor">
+          0 1  0.1 1  1 1
+        </table>
+        <table by="potassium" x_name="potassium stress factor">
+          0 0  0.5 1  1 1
+        </table>
+      </impact>
+
+      <!-- Impact on root segment carbon cost of exudates -->
+      <impact on="root segment carbon cost of exudates">
+        <table by="nitrate" x_name="nitrate stress factor">
+          0 1  1 1
+        </table>
+        <table by="phosphorus" x_name="phosphorus stress factor">
+          0 1  1 1
+        </table>
+        <table by="potassium" x_name="potassium stress factor">
+          0 1  1 1
+        </table>
+      </impact>
+
+      <!-- Impact on root segment respiration -->
+      <impact on="root segment respiration">
+        <table by="nitrate" x_name="nitrate stress factor">
+          0 1  1 1
+        </table>
+        <table by="phosphorus" x_name="phosphorus stress factor">
+          0 1  1 1
+        </table>
+        <table by="potassium" x_name="potassium stress factor">
+          0 0  1 1
+        </table>
+      </impact>
+
+      <!-- Impact on root segment secondary growth -->
+      <impact on="root segment secondary growth">
+        <table by="nitrate" x_name="nitrate stress factor">
+          0 0  1 1
+        </table>
+        <table by="phosphorus" x_name="phosphorus stress factor">
+          0 0  1 1
+        </table>
+        <table by="potassium" x_name="potassium stress factor">
+          0 0  1 1
+        </table>
+      </impact>
+
+      <!-- Impact on stem respiration -->
+      <impact on="stem respiration">
+        <table by="nitrate" x_name="nitrate stress factor">
+          0 1  1 1
+        </table>
+        <table by="phosphorus" x_name="phosphorus stress factor">
+          0 1  1 1
+        </table>
+        <table by="potassium" x_name="potassium stress factor">
+          0 1  1 1
+        </table>
+      </impact>
+
+    </stressImpactFactors>
+
+  </rootTypeParameters>
+
+</SimRoot>
